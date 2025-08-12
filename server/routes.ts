@@ -3,6 +3,8 @@ import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
+import { marketDataService, PROVIDERS } from "./marketData";
+import { brokerService, BROKERS } from "./brokerApi";
 import { insertStrategySchema, insertTransactionSchema, insertBacktestResultSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -248,25 +250,127 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Market data simulation endpoint
-  app.get('/api/market-data/:symbol', isAuthenticated, async (req: any, res) => {
+  // Real Market Data Routes
+  app.get("/api/market-data/quote/:symbol", isAuthenticated, async (req, res) => {
     try {
       const { symbol } = req.params;
-      
-      // Mock market data (replace with real market data API)
-      const mockData = {
-        symbol,
-        price: Math.random() * 200 + 50,
-        change: (Math.random() - 0.5) * 10,
-        changePercent: (Math.random() - 0.5) * 0.1,
-        volume: Math.floor(Math.random() * 1000000),
-        timestamp: new Date()
-      };
-      
-      res.json(mockData);
-    } catch (error) {
-      console.error("Error fetching market data:", error);
-      res.status(500).json({ message: "Failed to fetch market data" });
+      const { provider } = req.query;
+      const quote = await marketDataService.getQuote(symbol, provider as any);
+      res.json(quote);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/market-data/historical/:symbol", isAuthenticated, async (req, res) => {
+    try {
+      const { symbol } = req.params;
+      const { period, provider } = req.query;
+      const data = await marketDataService.getHistoricalData(symbol, period as string, provider as any);
+      res.json(data);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/market-data/providers", isAuthenticated, async (req, res) => {
+    try {
+      const currentProvider = marketDataService.getCurrentProvider();
+      const testResults = await marketDataService.testAllProviders();
+      res.json({
+        available: Object.values(PROVIDERS),
+        current: currentProvider,
+        status: testResults
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/market-data/provider", isAuthenticated, async (req, res) => {
+    try {
+      const { provider } = req.body;
+      if (!Object.values(PROVIDERS).includes(provider)) {
+        return res.status(400).json({ message: "Invalid provider" });
+      }
+      marketDataService.setProvider(provider);
+      res.json({ success: true, provider });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Broker Trading Routes
+  app.get("/api/trading/account", isAuthenticated, async (req, res) => {
+    try {
+      const account = await brokerService.getAccount();
+      res.json(account);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/trading/positions", isAuthenticated, async (req, res) => {
+    try {
+      const positions = await brokerService.getPositions();
+      res.json(positions);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/trading/orders", isAuthenticated, async (req, res) => {
+    try {
+      const orders = await brokerService.getOrders();
+      res.json(orders);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/trading/orders", isAuthenticated, async (req, res) => {
+    try {
+      const order = await brokerService.submitOrder(req.body);
+      res.json(order);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.delete("/api/trading/orders/:orderId", isAuthenticated, async (req, res) => {
+    try {
+      const { orderId } = req.params;
+      await brokerService.cancelOrder(orderId);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/trading/brokers", isAuthenticated, async (req, res) => {
+    try {
+      const currentBroker = brokerService.getCurrentBroker();
+      const connectionStatus = await brokerService.testBrokerConnection();
+      res.json({
+        available: Object.values(BROKERS),
+        current: currentBroker,
+        connected: connectionStatus
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/trading/broker", isAuthenticated, async (req, res) => {
+    try {
+      const { broker } = req.body;
+      if (!Object.values(BROKERS).includes(broker)) {
+        return res.status(400).json({ message: "Invalid broker" });
+      }
+      brokerService.setBroker(broker);
+      res.json({ success: true, broker });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
     }
   });
 

@@ -1,0 +1,88 @@
+Build a Python (Flask or FastAPI) web app on Replit that:
+
+Market Data Integration
+Integrates with at least three free market data providers below (choose based on needs):
+
+Alpha Vantage: Free real-time and historical data for stocks, forex, crypto, technical indicators (https://www.alphavantage.co/).
+
+Finnhub: Real-time equities, forex, news, economic indicators (https://finnhub.io/).
+
+Marketstack: Minute-level data, global coverage, generous free tier (https://marketstack.com/).
+
+IEX Cloud: US stock prices, free tier (https://iexcloud.io/).
+
+Twelve Data: Stocks, ETFs, forex, crypto (https://twelvedata.com/).
+
+Polygon.io: Free REST/WebSocket feeds for various assets (https://polygon.io/).
+
+Design the app so the user can select or cycle between different market data sources.
+
+Implement a unified interface for real-time and scalable historical data retrieval.
+
+Ensure API keys are securely managed via environment variables or secure config.
+
+Broker API Integration
+Add code modules to support live trade execution via free broker APIs:
+
+Alpaca Markets (stock/crypto, REST API)
+
+Interactive Brokers (IBKR, broader assets, TWS Gateway or REST API)
+
+Provide mock (paper) trading mode for trial use and live execution mode for funded accounts.
+
+Architect the trading strategy engine to process incoming live data and route orders to brokers.
+
+Database Migration Setup
+Use Prisma or Drizzle ORM (or SQLite/PostgreSQL with Alembic) for DB schema and migrations.
+
+Include instructions/code for:
+
+Initial schema push (npm run db:push or npx prisma migrate dev)
+
+Generating and applying migrations for production:
+
+Example: npx prisma migrate diff
+
+Mark/resolve migrations: npx prisma migrate resolve
+
+Sync migration history during deployment.
+
+Automate migration steps in package scripts so production deploys safely update schema and data.
+
+Tips for Users:
+
+For accurate backtesting, always prefer APIs with both real-time and historical feeds.
+
+Review each API's request limits, latency, and coverage before building high-frequency components.
+
+Use environment variables for API credentials (os.environ.get("ALPHA_VANTAGE_API_KEY")).
+
+Offer both backtesting and paper/live trading options, with clear UI separation.
+
+Sample Starter Code Block:
+
+python
+# main.py (Python FastAPI/Flask)
+from fastapi import FastAPI
+import requests
+import os
+
+ALPHA_VANTAGE_API_KEY = os.environ.get("ALPHA_VANTAGE_API_KEY")
+FINNHUB_API_KEY = os.environ.get("FINNHUB_API_KEY")
+
+app = FastAPI()
+
+@app.get("/alpha_vantage")
+def alpha_vantage_quote(symbol: str):
+    url = f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={symbol}&interval=1min&apikey={ALPHA_VANTAGE_API_KEY}"
+    response = requests.get(url)
+    return response.json()
+
+@app.get("/finnhub")
+def finnhub_quote(symbol: str):
+    url = f"https://finnhub.io/api/v1/quote?symbol={symbol}&token={FINNHUB_API_KEY}"
+    response = requests.get(url)
+    return response.json()
+Engineers: Use this as a project starter template. Expand with brokerage integration, strategy logic, periodic DB migrations, and user authentication as needed. Documentation and onboarding tips should be included so users can quickly connect their own API keys.
+
+Your finished app should allow traders to backtest, monitor live data, trial paper trades, and switch seamlessly to real trading using free market data and broker APIs—without hidden costs.
