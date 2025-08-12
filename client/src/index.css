@@ -1,0 +1,159 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(220, 14%, 9%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(220, 14%, 9%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(220, 14%, 9%);
+  --primary: hsl(203, 89%, 53%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(147, 79%, 42%);
+  --secondary-foreground: hsl(0, 0%, 100%);
+  --muted: hsl(220, 14%, 96%);
+  --muted-foreground: hsl(220, 14%, 46%);
+  --accent: hsl(33, 100%, 50%);
+  --accent-foreground: hsl(0, 0%, 100%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --border: hsl(220, 13%, 91%);
+  --input: hsl(220, 13%, 91%);
+  --ring: hsl(203, 89%, 53%);
+  --chart-1: hsl(203, 89%, 53%);
+  --chart-2: hsl(160, 100%, 36%);
+  --chart-3: hsl(42, 93%, 56%);
+  --chart-4: hsl(147, 79%, 42%);
+  --chart-5: hsl(341, 75%, 51%);
+  --sidebar: hsl(0, 0%, 100%);
+  --sidebar-foreground: hsl(220, 14%, 9%);
+  --sidebar-primary: hsl(203, 89%, 53%);
+  --sidebar-primary-foreground: hsl(0, 0%, 100%);
+  --sidebar-accent: hsl(220, 14%, 96%);
+  --sidebar-accent-foreground: hsl(203, 89%, 53%);
+  --sidebar-border: hsl(220, 13%, 91%);
+  --sidebar-ring: hsl(203, 89%, 53%);
+  --font-sans: 'Open Sans', sans-serif;
+  --font-serif: Georgia, serif;
+  --font-mono: Monaco, Menlo, 'Ubuntu Mono', monospace;
+  --radius: 0.5rem;
+  --profit: hsl(120, 61%, 50%);
+  --loss: hsl(0, 84%, 60%);
+  --warning: hsl(38, 92%, 50%);
+  --dark-100: hsl(0, 0%, 12%);
+  --dark-200: hsl(0, 0%, 18%);
+  --dark-300: hsl(0, 0%, 24%);
+  --dark-400: hsl(0, 0%, 30%);
+}
+
+.dark {
+  --background: hsl(0, 0%, 12%);
+  --foreground: hsl(0, 0%, 95%);
+  --card: hsl(0, 0%, 18%);
+  --card-foreground: hsl(0, 0%, 95%);
+  --popover: hsl(0, 0%, 12%);
+  --popover-foreground: hsl(0, 0%, 95%);
+  --primary: hsl(203, 89%, 53%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(147, 79%, 42%);
+  --secondary-foreground: hsl(0, 0%, 100%);
+  --muted: hsl(0, 0%, 18%);
+  --muted-foreground: hsl(0, 0%, 63%);
+  --accent: hsl(33, 100%, 50%);
+  --accent-foreground: hsl(0, 0%, 100%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --border: hsl(0, 0%, 24%);
+  --input: hsl(0, 0%, 24%);
+  --ring: hsl(203, 89%, 53%);
+  --chart-1: hsl(203, 89%, 53%);
+  --chart-2: hsl(160, 100%, 36%);
+  --chart-3: hsl(42, 93%, 56%);
+  --chart-4: hsl(147, 79%, 42%);
+  --chart-5: hsl(341, 75%, 51%);
+  --sidebar: hsl(0, 0%, 18%);
+  --sidebar-foreground: hsl(0, 0%, 95%);
+  --sidebar-primary: hsl(203, 89%, 53%);
+  --sidebar-primary-foreground: hsl(0, 0%, 100%);
+  --sidebar-accent: hsl(0, 0%, 24%);
+  --sidebar-accent-foreground: hsl(203, 89%, 53%);
+  --sidebar-border: hsl(0, 0%, 24%);
+  --sidebar-ring: hsl(203, 89%, 53%);
+  --font-sans: 'Open Sans', sans-serif;
+  --font-serif: Georgia, serif;
+  --font-mono: Monaco, Menlo, 'Ubuntu Mono', monospace;
+  --radius: 0.5rem;
+  --profit: hsl(120, 61%, 50%);
+  --loss: hsl(0, 84%, 60%);
+  --warning: hsl(38, 92%, 50%);
+  --dark-100: hsl(0, 0%, 12%);
+  --dark-200: hsl(0, 0%, 18%);
+  --dark-300: hsl(0, 0%, 24%);
+  --dark-400: hsl(0, 0%, 30%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+}
+
+@layer utilities {
+  .text-profit {
+    color: var(--profit);
+  }
+  
+  .text-loss {
+    color: var(--loss);
+  }
+  
+  .text-warning {
+    color: var(--warning);
+  }
+  
+  .bg-profit {
+    background-color: var(--profit);
+  }
+  
+  .bg-loss {
+    background-color: var(--loss);
+  }
+  
+  .bg-warning {
+    background-color: var(--warning);
+  }
+  
+  .bg-dark-100 {
+    background-color: var(--dark-100);
+  }
+  
+  .bg-dark-200 {
+    background-color: var(--dark-200);
+  }
+  
+  .bg-dark-300 {
+    background-color: var(--dark-300);
+  }
+  
+  .bg-dark-400 {
+    background-color: var(--dark-400);
+  }
+  
+  .border-profit {
+    border-color: var(--profit);
+  }
+  
+  .border-loss {
+    border-color: var(--loss);
+  }
+  
+  .border-warning {
+    border-color: var(--warning);
+  }
+}
