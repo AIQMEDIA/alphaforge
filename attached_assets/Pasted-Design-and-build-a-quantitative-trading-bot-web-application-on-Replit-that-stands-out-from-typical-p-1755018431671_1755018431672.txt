@@ -1,0 +1,80 @@
+Design and build a quantitative trading bot web application on Replit that stands out from typical platforms by prioritizing reliability, transparency, and robust risk management—directly addressing common industry shortcomings identified in the thread. The app should be tailored for trader usage habits and offer a compelling onboarding-to-subscription flow that seamlessly integrates Stripe, PayPal, and Square for payments.
+
+Core Features (Addressing Common Shortcomings):
+Comprehensive Backtesting & Simulation
+
+Run historical simulations with realistic transaction costs, liquidity constraints, slippage, and spread modeling for stocks, indices, and ETFs.
+
+Enable stress-testing across multiple market regimes, including crash scenarios and volatility spikes.
+
+Include delisted/merged asset data to combat survivorship bias.
+
+Advanced Model Validation
+
+Support out-of-sample and walk-forward testing setups.
+
+Allow users to compare in-sample and out-of-sample results, with warnings for overfitting.
+
+Offer regular model re-validation prompts and adaptive updates as new data is received.
+
+Layered Risk Controls
+
+Provide configurable kill-switches, position limits, and circuit breakers.
+
+Real-time exposure, Value-at-Risk (VaR), drawdown, and correlation monitoring dashboards.
+
+Enable paper trading and shadow portfolios for strategy trial runs.
+
+Transparency & Audit Trail
+
+Log every action the bot takes for auditability.
+
+Visual explainers for model decisions using easy-to-understand charts and summaries.
+
+User Experience & Trader Habits
+
+Clean, intuitive interface optimized for desktop and mobile users.
+
+Step-by-step wizard for setup and strategy configuration (even for non-coders).
+
+Dashboard for fast monitoring, alerts, and actionable summaries.
+
+Integrations for exporting trading logs and performance data to Excel/PDF for compliance reviews.
+
+Onboarding and Monetization Flow
+Free Trial Structure:
+
+Offer a full-featured, no-limits free trial of at least 30 days to ensure users can confidently backtest, simulate, and run paper trades before committing.
+
+Automated reminders as the trial nears expiration, with one-click subscription conversion functionality.
+
+Sales Funnel and Payment Integration:
+
+After the trial, guide users through a streamlined payment setup supporting Stripe, PayPal, and Square.
+
+Multiple monthly and annual subscription options with tiered plans (basic, pro, enterprise) including feature breakdowns.
+
+Secure in-app payment processing with immediate plan activation.
+
+"Refer a friend" and affiliate options to encourage viral growth.
+
+Sample Replit App Prompt
+Build a quantitative trading bot web application on Replit that:
+
+Provides realistic backtesting and stress-testing, including delisted assets, slippage, and market regime analysis.
+
+Supports robust, transparent model validation with out-of-sample walk-forward testing and regular re-training prompts.
+
+Features multi-layered risk controls with configurable kill-switches, limits, and real-time monitoring.
+
+Offers clear audit trails, explainable AI decisions, and downloadable compliance reports (Excel/PDF).
+
+Is easy to use for non-coders, includes paper trading for trial runs, and integrates with broker APIs for live execution.
+
+Delivers a free 30-day trial, after which users are guided through an in-app sales funnel supporting monthly subscriptions via Stripe, PayPal, or Square.
+
+Includes a referral/affiliate module for organic growth.
+
+Uses a modern, responsive interface tailored to trader workflows and quick monitoring needs.
+
+Build this in Python (Flask or FastAPI backend), with a React or Vue frontend. Use OAuth and secure user authentication. Ensure all payment flows are PCI-compliant and provide clear privacy policy/terms.
