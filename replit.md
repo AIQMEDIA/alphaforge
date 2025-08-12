@@ -1,8 +1,8 @@
-# QuantBot Pro - Quantitative Trading Bot Platform
+# AlphaForge - Quantitative Trading Bot Platform
 
 ## Overview
 
-QuantBot Pro is a comprehensive web application for quantitative trading that addresses common shortcomings in existing trading platforms through reliability, transparency, and robust risk management. The platform provides advanced backtesting capabilities, real-time portfolio monitoring, strategy development tools, and multi-layered risk controls.
+AlphaForge is a comprehensive web application for quantitative trading that addresses common shortcomings in existing trading platforms through reliability, transparency, and robust risk management. The platform provides advanced backtesting capabilities, real-time portfolio monitoring, strategy development tools, and multi-layered risk controls.
 
 The application is designed as a full-stack TypeScript solution with a React frontend and Express backend, targeting both novice and professional traders who need institutional-grade trading tools with an intuitive interface.
 

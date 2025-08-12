@@ -9,6 +9,7 @@ import {
   CheckCircle,
   ArrowRight,
 } from "lucide-react";
+import alphaForgeLogo from "@assets/AlphaForge_1755019929567.png";
 
 export default function Landing() {
   const features = [
@@ -49,7 +50,7 @@ export default function Landing() {
       <header className="bg-white/80 dark:bg-dark-200/80 backdrop-blur-sm border-b border-gray-200 dark:border-dark-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <h1 className="text-2xl font-bold text-primary">QuantBot Pro</h1>
+            <h1 className="text-2xl font-bold text-primary">AlphaForge</h1>
             <div className="flex items-center space-x-4">
               <a
                 href="/api/login"
@@ -69,11 +70,19 @@ export default function Landing() {
       {/* Hero Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
+          <div className="mb-8">
+            <img 
+              src={alphaForgeLogo} 
+              alt="AlphaForge Logo" 
+              className="mx-auto mb-6 h-64 w-auto max-w-full"
+              data-testid="logo-alphaforge"
+            />
+          </div>
           <Badge className="mb-6 bg-primary/10 text-primary border-primary/20">
             Professional Trading Platform
           </Badge>
           <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
-            Quantitative Trading
+            Quantitative Trading Bot System
             <span className="block text-primary">Made Reliable</span>
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
@@ -189,7 +198,7 @@ export default function Landing() {
       <footer className="bg-white dark:bg-dark-200 border-t border-gray-200 dark:border-dark-300 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-primary mb-4">QuantBot Pro</h2>
+            <h2 className="text-2xl font-bold text-primary mb-4">AlphaForge</h2>
             <p className="text-gray-600 dark:text-gray-300 mb-8">
               Professional quantitative trading platform built for reliability and transparency.
             </p>
