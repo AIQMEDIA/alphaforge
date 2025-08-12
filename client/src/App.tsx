@@ -14,6 +14,7 @@ import PaperTrading from "@/pages/paper-trading";
 import RiskManagement from "@/pages/risk-management";
 import Analytics from "@/pages/analytics";
 import Subscribe from "@/pages/subscribe";
+import Settings from "@/pages/settings";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -31,6 +32,7 @@ function Router() {
           <Route path="/risk-management" component={RiskManagement} />
           <Route path="/analytics" component={Analytics} />
           <Route path="/subscribe" component={Subscribe} />
+          <Route path="/settings" component={Settings} />
         </>
       )}
       <Route component={NotFound} />
