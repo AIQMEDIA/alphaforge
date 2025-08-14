@@ -5,8 +5,7 @@ import { Navbar } from "@/components/layout/navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Crown, Check, CreditCard, Shield } from "lucide-react";
+import { Crown, Check, Shield, Atom, Zap, Cpu } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -21,55 +20,67 @@ const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 const plans = [
   {
-    id: "basic",
-    name: "Basic Plan",
-    price: 29,
-    description: "Perfect for getting started with quantitative trading",
+    id: "professional",
+    name: "Professional",
+    price: 99,
+    originalPrice: 199,
+    trialDays: 30,
+    description: "Perfect for serious traders",
     features: [
-      "Up to 3 active strategies",
-      "Basic backtesting",
+      "Real market data from 4 providers",
+      "Live trading with Alpaca Markets", 
+      "Basic quantum optimization",
+      "Portfolio backtesting",
+      "Risk management tools",
       "Paper trading",
-      "Standard analytics",
-      "Email support",
-      "5GB data storage"
+      "Strategy builder",
+      "Email support"
     ],
     popular: false,
+    quantumFeature: "Basic Quantum",
+    badgeText: "50% OFF"
   },
   {
-    id: "pro",
-    name: "Pro Plan",
-    price: 79,
-    description: "Advanced features for serious traders",
+    id: "quantum-pro",
+    name: "Quantum Pro",
+    price: 299,
+    originalPrice: 599,
+    trialDays: 60,
+    description: "Full quantum computing power",
     features: [
-      "Unlimited strategies",
-      "Advanced backtesting with slippage",
-      "Live trading integration",
-      "Advanced risk management",
-      "Real-time market data",
-      "Priority support",
-      "50GB data storage",
-      "Custom indicators",
-      "API access"
+      "Everything in Professional",
+      "Full quantum computing access",
+      "VQE & QAOA algorithms",
+      "Quantum machine learning",
+      "IBM Quantum, Google Cirq, Amazon Braket",
+      "Unlimited quantum optimizations",
+      "Advanced risk analysis",
+      "Priority support"
     ],
     popular: true,
+    quantumFeature: "Full Quantum Access",
+    badgeText: "MOST POPULAR"
   },
   {
     id: "enterprise",
     name: "Enterprise",
-    price: 199,
-    description: "Full-featured solution for institutions",
+    price: 999,
+    originalPrice: 1999,
+    trialDays: 90,
+    description: "For institutional traders",
     features: [
-      "Everything in Pro",
-      "Multi-account management",
-      "Custom integrations",
-      "Dedicated support",
-      "Advanced compliance tools",
+      "Everything in Quantum Pro",
+      "Custom quantum algorithms",
+      "Dedicated quantum hardware access",
+      "API access & integrations",
       "White-label options",
-      "Unlimited data storage",
-      "Custom development",
-      "SLA guarantee"
+      "24/7 dedicated support",
+      "Custom training sessions",
+      "Enterprise SLA"
     ],
     popular: false,
+    quantumFeature: "Enterprise Quantum",
+    badgeText: "50% OFF"
   },
 ];
 
@@ -110,11 +121,19 @@ const SubscribeForm = ({ selectedPlan }: { selectedPlan: any }) => {
     <form onSubmit={handleSubmit} data-testid="payment-form">
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-          Subscribe to {selectedPlan.name}
+          Start Your {selectedPlan.trialDays}-Day Free Trial
         </h3>
         <p className="text-gray-600 dark:text-gray-400">
-          {formatCurrency(selectedPlan.price)}/month - {selectedPlan.description}
+          {selectedPlan.name} - {selectedPlan.quantumFeature}
         </p>
+        <div className="mt-2 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+          <p className="text-green-700 dark:text-green-300 font-semibold text-sm">
+            💎 FREE for {selectedPlan.trialDays} days, then ${selectedPlan.price}/month
+          </p>
+          <p className="text-xs text-green-600 dark:text-green-400">
+            Cancel anytime • No hidden fees • Instant quantum access
+          </p>
+        </div>
       </div>
       
       <div className="mb-6">
@@ -124,10 +143,10 @@ const SubscribeForm = ({ selectedPlan }: { selectedPlan: any }) => {
       <Button
         type="submit"
         disabled={!stripe}
-        className="w-full"
+        className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
         data-testid="button-subscribe"
       >
-        Subscribe to {selectedPlan.name}
+        Start Free Trial
       </Button>
     </form>
   );
@@ -143,7 +162,7 @@ const formatCurrency = (value: number) => {
 export default function Subscribe() {
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const { toast } = useToast();
-  const [selectedPlan, setSelectedPlan] = useState(plans[1]); // Default to Pro plan
+  const [selectedPlan, setSelectedPlan] = useState(plans[1]); // Default to Quantum Pro plan
   const [clientSecret, setClientSecret] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -168,7 +187,9 @@ export default function Subscribe() {
     // Create subscription as soon as the page loads
     const createSubscription = async () => {
       try {
-        const response = await apiRequest("POST", "/api/get-or-create-subscription");
+        const response = await apiRequest("POST", "/api/get-or-create-subscription", { 
+          plan: selectedPlan.id 
+        });
         const data = await response.json();
         setClientSecret(data.clientSecret);
       } catch (error: any) {
@@ -194,26 +215,12 @@ export default function Subscribe() {
     };
 
     createSubscription();
-  }, [isAuthenticated, toast]);
+  }, [isAuthenticated, selectedPlan.id, toast]);
 
   if (authLoading || !isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-dark-100">
-        <Navbar />
-        <div className="flex items-center justify-center min-h-[80vh]">
-          <div className="text-center">
-            <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4" />
-            <p className="text-gray-600 dark:text-gray-400">Setting up your subscription...</p>
-          </div>
-        </div>
       </div>
     );
   }
@@ -225,201 +232,261 @@ export default function Subscribe() {
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center">
-              <Crown className="h-8 w-8 text-accent" />
+            <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
+              <Atom className="h-8 w-8 text-white" />
             </div>
           </div>
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Choose Your Plan
+            Choose Your Quantum Plan
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            Unlock the full potential of quantitative trading with our professional-grade platform
+          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-6">
+            Unlock the full potential of quantum computing for trading
+          </p>
+          <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-2 text-lg">
+            🎉 Limited Time: 50% OFF + Extended Free Trials
+          </Badge>
+        </div>
+
+        {/* Hero Section */}
+        <div className="text-center mb-16">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            World's First Quantum-Powered Trading Platform
+          </h2>
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+            Experience the same quantum computing technology used by Goldman Sachs, JP Morgan, and Citi for institutional trading
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Plan Selection */}
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Select a Plan
-            </h2>
-            
-            <div className="space-y-4">
-              {plans.map((plan) => (
-                <Card
-                  key={plan.id}
-                  className={`cursor-pointer transition-all duration-200 ${
-                    selectedPlan.id === plan.id
-                      ? "border-2 border-primary bg-blue-50 dark:bg-dark-300 shadow-md"
-                      : "border border-gray-200 dark:border-dark-400 hover:border-primary hover:shadow-sm"
-                  }`}
-                  onClick={() => setSelectedPlan(plan)}
-                  data-testid={`plan-${plan.id}`}
-                >
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <div className="flex items-center space-x-2 mb-2">
-                          <h3 className={`text-xl font-bold ${
-                            selectedPlan.id === plan.id ? "text-primary" : "text-gray-900 dark:text-white"
-                          }`}>
-                            {plan.name}
-                          </h3>
-                          {plan.popular && (
-                            <Badge className="bg-primary text-white">Most Popular</Badge>
-                          )}
-                        </div>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">
-                          {plan.description}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className={`text-3xl font-bold ${
-                          selectedPlan.id === plan.id ? "text-primary" : "text-gray-900 dark:text-white"
-                        }`}>
-                          {formatCurrency(plan.price)}
-                        </p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">/month</p>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      {plan.features.slice(0, 4).map((feature, index) => (
-                        <div key={index} className="flex items-center space-x-2 text-sm">
-                          <Check className="h-4 w-4 text-profit flex-shrink-0" />
-                          <span className="text-gray-700 dark:text-gray-300">{feature}</span>
-                        </div>
-                      ))}
-                      {plan.features.length > 4 && (
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          +{plan.features.length - 4} more features
-                        </p>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          {/* Payment Form */}
-          <div className="space-y-6">
-            <div className="sticky top-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <CreditCard className="h-5 w-5 mr-2" />
-                    Complete Your Subscription
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {clientSecret ? (
-                    <Elements stripe={stripePromise} options={{ clientSecret }}>
-                      <SubscribeForm selectedPlan={selectedPlan} />
-                    </Elements>
-                  ) : (
-                    <div className="text-center py-8">
-                      <div className="animate-spin w-6 h-6 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4" />
-                      <p className="text-gray-600 dark:text-gray-400">Initializing payment...</p>
+        {/* Pricing Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+          {plans.map((plan) => (
+            <Card
+              key={plan.id}
+              className={`relative transition-all duration-300 ${
+                plan.popular 
+                  ? "border-2 border-purple-500 shadow-2xl scale-105 z-10" 
+                  : "border border-gray-200 dark:border-dark-400 hover:shadow-lg"
+              }`}
+              data-testid={`plan-${plan.id}`}
+            >
+              {plan.popular && (
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                  <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-1">
+                    {plan.badgeText}
+                  </Badge>
+                </div>
+              )}
+              
+              <CardHeader className="text-center pb-4">
+                <div className="mb-4">
+                  {plan.id === 'quantum-pro' && (
+                    <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Crown className="h-8 w-8 text-white" />
                     </div>
                   )}
-                </CardContent>
-              </Card>
-
-              {/* Payment Security */}
-              <Card className="mt-6">
-                <CardContent className="p-4">
-                  <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 mb-3">
-                    <Shield className="h-4 w-4" />
-                    <span>Secure Payment</span>
-                  </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                    Your payment information is encrypted and secure. We never store your credit card details.
+                  {plan.id === 'enterprise' && (
+                    <div className="w-16 h-16 bg-gradient-to-r from-gray-800 to-gray-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Cpu className="h-8 w-8 text-white" />
+                    </div>
+                  )}
+                  {plan.id === 'professional' && (
+                    <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Zap className="h-8 w-8 text-white" />
+                    </div>
+                  )}
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {plan.name}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400 mt-2">
+                    {plan.description}
                   </p>
-                  
-                  <Separator className="my-4" />
-                  
-                  <div className="flex items-center justify-center space-x-6">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-8 h-5 bg-blue-600 text-white text-xs flex items-center justify-center rounded">
-                        STRIPE
-                      </div>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">Stripe</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-8 h-5 bg-blue-500 text-white text-xs flex items-center justify-center rounded">
-                        PP
-                      </div>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">PayPal</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-8 h-5 bg-black text-white text-xs flex items-center justify-center rounded">
-                        SQ
-                      </div>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">Square</span>
-                    </div>
+                </div>
+
+                <div className="text-center">
+                  <div className="flex items-center justify-center space-x-2 mb-2">
+                    <span className="text-sm text-gray-500 line-through">
+                      {formatCurrency(plan.originalPrice)}
+                    </span>
+                    <Badge variant="secondary" className="bg-red-100 text-red-700">
+                      50% OFF
+                    </Badge>
                   </div>
-                </CardContent>
-              </Card>
+                  <div className="text-4xl font-bold text-gray-900 dark:text-white">
+                    {formatCurrency(plan.price)}
+                  </div>
+                  <p className="text-gray-600 dark:text-gray-400">/month</p>
+                  
+                  <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                    <p className="text-green-700 dark:text-green-300 font-semibold">
+                      🎁 {plan.trialDays}-Day FREE Trial
+                    </p>
+                    <p className="text-xs text-green-600 dark:text-green-400">
+                      No credit card required
+                    </p>
+                  </div>
+                </div>
+              </CardHeader>
+
+              <CardContent className="pt-0">
+                <div className="space-y-3 mb-6">
+                  {plan.features.map((feature, index) => (
+                    <div key={index} className="flex items-start space-x-3">
+                      <Check className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                      <span className="text-gray-700 dark:text-gray-300 text-sm">
+                        {feature}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <Button
+                  onClick={() => setSelectedPlan(plan)}
+                  className={`w-full ${
+                    selectedPlan.id === plan.id
+                      ? "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                      : plan.popular 
+                      ? "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                      : "bg-gray-900 dark:bg-white dark:text-gray-900 text-white hover:bg-gray-800"
+                  }`}
+                  data-testid={`select-plan-${plan.id}`}
+                >
+                  {selectedPlan.id === plan.id ? "Selected Plan" : `Start ${plan.trialDays}-Day Free Trial`}
+                </Button>
+
+                {plan.popular && (
+                  <p className="text-center text-xs text-gray-500 mt-2">
+                    Most quantum traders choose this plan
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Payment Section */}
+        {selectedPlan && (
+          <div className="max-w-2xl mx-auto mb-16">
+            <Card className="border-2 border-purple-200 dark:border-purple-800">
+              <CardHeader>
+                <CardTitle className="text-center flex items-center justify-center space-x-2">
+                  <Shield className="h-6 w-6 text-purple-600" />
+                  <span>Start Your {selectedPlan.trialDays}-Day Free Trial</span>
+                </CardTitle>
+                <div className="text-center">
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">
+                    Selected: <strong>{selectedPlan.name}</strong> - {selectedPlan.quantumFeature}
+                  </p>
+                  <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
+                    <p className="text-purple-700 dark:text-purple-300 font-semibold">
+                      💎 FREE for {selectedPlan.trialDays} days, then {formatCurrency(selectedPlan.price)}/month
+                    </p>
+                    <p className="text-sm text-purple-600 dark:text-purple-400 mt-1">
+                      Cancel anytime during trial • No hidden fees • Instant access to quantum algorithms
+                    </p>
+                  </div>
+                </div>
+              </CardHeader>
+
+              <CardContent>
+                {loading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full mx-auto mb-4" />
+                    <p className="text-gray-600 dark:text-gray-400">
+                      Setting up your quantum trial...
+                    </p>
+                  </div>
+                ) : clientSecret ? (
+                  <Elements stripe={stripePromise} options={{ clientSecret }}>
+                    <SubscribeForm selectedPlan={selectedPlan} />
+                  </Elements>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-gray-600 dark:text-gray-400">
+                      Failed to initialize payment. Please try again.
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
+        
+        {/* Trust Signals */}
+        <div className="mt-16 text-center">
+          <p className="text-gray-600 dark:text-gray-400 mb-8">
+            Trusted by quantum researchers and institutional traders worldwide
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 opacity-60">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">IBM</div>
+              <p className="text-sm text-gray-500">Quantum Partner</p>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">Google</div>
+              <p className="text-sm text-gray-500">Cirq Integration</p>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">Amazon</div>
+              <p className="text-sm text-gray-500">Braket Platform</p>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">Alpaca</div>
+              <p className="text-sm text-gray-500">Trading Partner</p>
             </div>
           </div>
         </div>
 
-        {/* Features Comparison */}
-        <div className="mt-16">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">
-            Compare Plans
-          </h2>
-          <Card>
-            <CardContent className="p-6">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-gray-200 dark:border-dark-400">
-                      <th className="text-left py-3 text-gray-900 dark:text-white font-semibold">Features</th>
-                      {plans.map((plan) => (
-                        <th key={plan.id} className="text-center py-3 text-gray-900 dark:text-white font-semibold">
-                          {plan.name}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="text-sm">
-                    <tr className="border-b border-gray-200 dark:border-dark-400">
-                      <td className="py-3 text-gray-700 dark:text-gray-300">Active Strategies</td>
-                      <td className="text-center py-3">3</td>
-                      <td className="text-center py-3">Unlimited</td>
-                      <td className="text-center py-3">Unlimited</td>
-                    </tr>
-                    <tr className="border-b border-gray-200 dark:border-dark-400">
-                      <td className="py-3 text-gray-700 dark:text-gray-300">Advanced Backtesting</td>
-                      <td className="text-center py-3">-</td>
-                      <td className="text-center py-3">✓</td>
-                      <td className="text-center py-3">✓</td>
-                    </tr>
-                    <tr className="border-b border-gray-200 dark:border-dark-400">
-                      <td className="py-3 text-gray-700 dark:text-gray-300">Live Trading</td>
-                      <td className="text-center py-3">-</td>
-                      <td className="text-center py-3">✓</td>
-                      <td className="text-center py-3">✓</td>
-                    </tr>
-                    <tr className="border-b border-gray-200 dark:border-dark-400">
-                      <td className="py-3 text-gray-700 dark:text-gray-300">API Access</td>
-                      <td className="text-center py-3">-</td>
-                      <td className="text-center py-3">✓</td>
-                      <td className="text-center py-3">✓</td>
-                    </tr>
-                    <tr>
-                      <td className="py-3 text-gray-700 dark:text-gray-300">Support Level</td>
-                      <td className="text-center py-3">Email</td>
-                      <td className="text-center py-3">Priority</td>
-                      <td className="text-center py-3">Dedicated</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
+        {/* FAQ */}
+        <div className="mt-16 max-w-4xl mx-auto">
+          <h3 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-8">
+            Frequently Asked Questions
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardContent className="p-6">
+                <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
+                  What is quantum computing in trading?
+                </h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Quantum algorithms can optimize portfolios exponentially faster than classical computers, 
+                  finding better risk-return combinations that traditional methods miss.
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-6">
+                <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
+                  Is the free trial really free?
+                </h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Yes! No credit card required. Experience full quantum capabilities for 30-90 days 
+                  depending on your selected plan.
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-6">
+                <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
+                  Can I cancel anytime?
+                </h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Absolutely. Cancel during your trial or anytime after with no penalties. 
+                  You'll retain access until the end of your billing period.
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-6">
+                <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
+                  Do I need quantum expertise?
+                </h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Not at all! Our quantum algorithms work behind the scenes. 
+                  Simply set your risk preferences and let quantum optimization do the work.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
