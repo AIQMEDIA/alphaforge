@@ -12,6 +12,7 @@ import {
   FileText,
   Settings,
   Crown,
+  Atom,
 } from "lucide-react";
 
 const navigation = [
@@ -22,6 +23,7 @@ const navigation = [
   { name: "Backtesting", href: "/backtesting", icon: History },
   { name: "Risk Management", href: "/risk-management", icon: Shield },
   { name: "Reports", href: "/analytics", icon: FileText },
+  { name: "Quantum AI", href: "/quantum", icon: Atom },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 

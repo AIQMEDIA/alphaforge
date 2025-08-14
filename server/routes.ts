@@ -5,6 +5,7 @@ import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { marketDataService, PROVIDERS } from "./marketData";
 import { brokerService, BROKERS } from "./brokerApi";
+import { quantumOptimizer, QuantumProvider, QuantumAlgorithm } from "./quantumOptimizer";
 import { insertStrategySchema, insertTransactionSchema, insertBacktestResultSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -369,6 +370,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       brokerService.setBroker(broker);
       res.json({ success: true, broker });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Quantum Computing Routes
+  app.get("/api/quantum/status", isAuthenticated, async (req, res) => {
+    try {
+      const status = await quantumOptimizer.getQuantumStatus();
+      res.json(status);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/quantum/optimize-portfolio", isAuthenticated, async (req, res) => {
+    try {
+      const { assets, covarianceMatrix, riskTolerance, budget, algorithm } = req.body;
+      
+      const optimizationParams = {
+        assets,
+        covarianceMatrix,
+        riskTolerance: riskTolerance || 0.5,
+        budget: budget || 1.0
+      };
+
+      const result = await quantumOptimizer.optimizePortfolio(
+        optimizationParams,
+        algorithm || QuantumAlgorithm.VQE
+      );
+
+      res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/quantum/market-prediction", isAuthenticated, async (req, res) => {
+    try {
+      const { historicalData, features } = req.body;
+      const prediction = await quantumOptimizer.quantumMarketPrediction(historicalData, features);
+      res.json(prediction);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/quantum/risk-analysis", isAuthenticated, async (req, res) => {
+    try {
+      const portfolioData = req.body;
+      const riskAnalysis = await quantumOptimizer.quantumRiskAnalysis(portfolioData);
+      res.json(riskAnalysis);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/quantum/provider", isAuthenticated, async (req, res) => {
+    try {
+      const { provider } = req.body;
+      if (!Object.values(QuantumProvider).includes(provider)) {
+        return res.status(400).json({ message: "Invalid quantum provider" });
+      }
+      quantumOptimizer.setProvider(provider);
+      res.json({ success: true, provider });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
