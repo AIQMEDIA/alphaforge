@@ -26,6 +26,8 @@ const plans = [
     originalPrice: 199,
     trialDays: 30,
     description: "Perfect for serious traders",
+    performanceFee: 15,
+    benchmark: 10,
     features: [
       "Real market data from 4 providers",
       "Live trading with Alpaca Markets", 
@@ -47,6 +49,8 @@ const plans = [
     originalPrice: 599,
     trialDays: 60,
     description: "Full quantum computing power",
+    performanceFee: 20,
+    benchmark: 8,
     features: [
       "Everything in Professional",
       "Full quantum computing access",
@@ -68,6 +72,8 @@ const plans = [
     originalPrice: 1999,
     trialDays: 90,
     description: "For institutional traders",
+    performanceFee: 25,
+    benchmark: 5,
     features: [
       "Everything in Quantum Pro",
       "Custom quantum algorithms",
@@ -81,6 +87,29 @@ const plans = [
     popular: false,
     quantumFeature: "Enterprise Quantum",
     badgeText: "50% OFF"
+  },
+  {
+    id: "performance-only",
+    name: "Performance Only",
+    price: 0,
+    originalPrice: 0,
+    trialDays: 90,
+    description: "Pay only when you profit",
+    performanceFee: 30,
+    benchmark: 0,
+    features: [
+      "Everything in Quantum Pro",
+      "Full quantum computing access",
+      "All quantum algorithms included",
+      "No monthly subscription fee",
+      "30% of profits above 0% return",
+      "Perfect for confident traders",
+      "Risk-free for losing months",
+      "Aligned incentives model"
+    ],
+    popular: false,
+    quantumFeature: "Performance-Based Quantum",
+    badgeText: "PAY ON SUCCESS"
   },
 ];
 
@@ -257,8 +286,34 @@ export default function Subscribe() {
           </p>
         </div>
 
+        {/* Performance Fee Explanation */}
+        <div className="max-w-4xl mx-auto mb-12 p-6 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+          <div className="text-center mb-4">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              🎯 Performance-Based Pricing Available
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              Only pay when you profit! Our quantum algorithms are so effective, we're confident enough to align our success with yours.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-green-600 mb-1">30%</div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Performance fee only when you profit
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-blue-600 mb-1">$0</div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Monthly fee for performance-only plan
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
           {plans.map((plan) => (
             <Card
               key={plan.id}
@@ -294,6 +349,11 @@ export default function Subscribe() {
                       <Zap className="h-8 w-8 text-white" />
                     </div>
                   )}
+                  {plan.id === 'performance-only' && (
+                    <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Check className="h-8 w-8 text-white" />
+                    </div>
+                  )}
                   <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
                     {plan.name}
                   </h3>
@@ -312,9 +372,19 @@ export default function Subscribe() {
                     </Badge>
                   </div>
                   <div className="text-4xl font-bold text-gray-900 dark:text-white">
-                    {formatCurrency(plan.price)}
+                    {plan.price === 0 ? "FREE" : formatCurrency(plan.price)}
                   </div>
-                  <p className="text-gray-600 dark:text-gray-400">/month</p>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {plan.price === 0 ? "Base Plan" : "/month"}
+                  </p>
+                  
+                  {plan.performanceFee && (
+                    <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                      <p className="text-blue-700 dark:text-blue-300 font-semibold text-sm">
+                        + {plan.performanceFee}% of profits above {plan.benchmark}% annually
+                      </p>
+                    </div>
+                  )}
                   
                   <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                     <p className="text-green-700 dark:text-green-300 font-semibold">
@@ -436,6 +506,36 @@ export default function Subscribe() {
           </div>
         </div>
 
+        {/* Performance Fee Details */}
+        <div className="mt-16 max-w-6xl mx-auto">
+          <h3 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-8">
+            Performance Fee Structure
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {plans.map((plan) => (
+              <Card key={`perf-${plan.id}`} className="text-center">
+                <CardContent className="p-6">
+                  <h4 className="font-bold text-gray-900 dark:text-white mb-2">
+                    {plan.name}
+                  </h4>
+                  <div className="text-2xl font-bold text-blue-600 mb-1">
+                    {plan.performanceFee}%
+                  </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    of profits above {plan.benchmark}% annually
+                  </p>
+                  <div className="mt-3 p-2 bg-gray-50 dark:bg-gray-800 rounded">
+                    <p className="text-xs text-gray-500">
+                      Example: On $100k profit above {plan.benchmark}%, 
+                      you pay ${(100000 * plan.performanceFee / 100).toLocaleString()}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
         {/* FAQ */}
         <div className="mt-16 max-w-4xl mx-auto">
           <h3 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-8">
@@ -445,44 +545,44 @@ export default function Subscribe() {
             <Card>
               <CardContent className="p-6">
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
-                  What is quantum computing in trading?
+                  How do performance fees work?
                 </h4>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Quantum algorithms can optimize portfolios exponentially faster than classical computers, 
-                  finding better risk-return combinations that traditional methods miss.
+                  You only pay when you profit above the benchmark return. If your portfolio gains 15% 
+                  and the benchmark is 8%, you pay the performance fee only on the 7% excess return.
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6">
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
-                  Is the free trial really free?
+                  What if I lose money?
                 </h4>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Yes! No credit card required. Experience full quantum capabilities for 30-90 days 
-                  depending on your selected plan.
+                  You pay no performance fees during losing periods. Performance-only plan users 
+                  pay nothing at all during months without profits.
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6">
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
-                  Can I cancel anytime?
+                  When are fees calculated?
                 </h4>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Absolutely. Cancel during your trial or anytime after with no penalties. 
-                  You'll retain access until the end of your billing period.
+                  Performance fees are calculated and charged monthly based on realized gains. 
+                  We use high watermark accounting to ensure fair fee calculation.
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6">
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
-                  Do I need quantum expertise?
+                  Can I switch between pricing models?
                 </h4>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Not at all! Our quantum algorithms work behind the scenes. 
-                  Simply set your risk preferences and let quantum optimization do the work.
+                  Yes! You can switch between subscription and performance-based pricing at any time. 
+                  Changes take effect at the start of your next billing cycle.
                 </p>
               </CardContent>
             </Card>

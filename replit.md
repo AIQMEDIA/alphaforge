@@ -46,6 +46,14 @@ Preferred communication style: Simple, everyday language.
 - Built comprehensive quantum computing UI with algorithm selection and real-time results
 - Integrated quantum status monitoring and provider switching capabilities
 
+### Performance-Based Revenue Model Added (August 14, 2025)
+- Implemented hybrid pricing model with both subscription and performance-based options
+- Added performance-only plan (30% of profits above 0% return, no monthly fee)
+- Created tiered performance fees: Professional (15% above 10%), Quantum Pro (20% above 8%), Enterprise (25% above 5%)
+- Built comprehensive performance fee calculator and explanation system
+- Integrated industry-standard high watermark accounting methodology
+- Added transparent fee structure with real-world examples and benchmarks
+
 ## System Architecture
 
 ### Frontend Architecture
@@ -86,6 +94,8 @@ Preferred communication style: Simple, everyday language.
 ### Payment Processing
 - **Stripe Integration**: Full payment processing with subscription management for tiered pricing plans
 - **Billing Models**: Trial-based onboarding with automated subscription conversion
+- **Performance-Based Pricing**: Revenue sharing model with 15-30% performance fees on profits above benchmark
+- **Hybrid Model**: Both fixed subscription and performance-only pricing options available
 
 ### Development Tools
 - **Build System**: Vite with React plugin and TypeScript support
