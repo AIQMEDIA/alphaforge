@@ -83,6 +83,12 @@ export interface IStorage {
   createAccountVerification(verification: InsertAccountVerification): Promise<AccountVerification>;
   updateAccountVerification(id: string, updates: Partial<InsertAccountVerification>): Promise<AccountVerification>;
   
+  // Performance monitoring operations
+  getChatSessionsInDateRange(start: Date, end: Date): Promise<ChatSession[]>;
+  getChatConversationsInDateRange(start: Date, end: Date): Promise<ChatConversation[]>;
+  getFraudRecordsInDateRange(start: Date, end: Date): Promise<FraudPrevention[]>;
+  getCRMLeadsInDateRange(start: Date, end: Date): Promise<CrmLead[]>;
+  
   // Portfolio analytics
   getPortfolioValue(userId: string): Promise<number>;
   getPortfolioPerformance(userId: string, days: number): Promise<any[]>;
@@ -369,6 +375,51 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     return record;
+  }
+
+  // Performance monitoring methods
+  async getChatSessionsInDateRange(start: Date, end: Date): Promise<ChatSession[]> {
+    return await db
+      .select()
+      .from(chatSessions)
+      .where(and(
+        gte(chatSessions.createdAt, start),
+        lte(chatSessions.createdAt, end)
+      ))
+      .orderBy(desc(chatSessions.createdAt));
+  }
+
+  async getChatConversationsInDateRange(start: Date, end: Date): Promise<ChatConversation[]> {
+    return await db
+      .select()
+      .from(chatConversations)
+      .where(and(
+        gte(chatConversations.createdAt, start),
+        lte(chatConversations.createdAt, end)
+      ))
+      .orderBy(desc(chatConversations.createdAt));
+  }
+
+  async getFraudRecordsInDateRange(start: Date, end: Date): Promise<FraudPrevention[]> {
+    return await db
+      .select()
+      .from(fraudPrevention)
+      .where(and(
+        gte(fraudPrevention.createdAt, start),
+        lte(fraudPrevention.createdAt, end)
+      ))
+      .orderBy(desc(fraudPrevention.createdAt));
+  }
+
+  async getCRMLeadsInDateRange(start: Date, end: Date): Promise<CrmLead[]> {
+    return await db
+      .select()
+      .from(crmLeads)
+      .where(and(
+        gte(crmLeads.createdAt, start),
+        lte(crmLeads.createdAt, end)
+      ))
+      .orderBy(desc(crmLeads.createdAt));
   }
 }
 

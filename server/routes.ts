@@ -10,6 +10,8 @@ import { brokerService, BROKERS } from "./brokerApi";
 import { quantumOptimizer, QuantumProvider, QuantumAlgorithm } from "./quantumOptimizer";
 import { quantumAssistant } from "./quantumAssistant";
 import { fraudPreventionService } from "./fraudPrevention";
+import { weeklyScheduler } from './weeklyScheduler.js';
+import { emailService } from './emailService.js';
 import { insertStrategySchema, insertTransactionSchema, insertBacktestResultSchema, insertCrmLeadSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -763,6 +765,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to generate report" });
     }
   });
+
+  // Performance monitoring routes
+  app.get('/api/admin/performance-report', isAuthenticated, async (req: any, res) => {
+    try {
+      const weekOffset = parseInt(req.query.weekOffset as string) || 0;
+      const { performanceMonitor } = await import('./performanceMonitoring.js');
+      const metrics = await performanceMonitor.generateWeeklyReport(weekOffset);
+      res.json(metrics);
+    } catch (error) {
+      console.error("Error generating performance report:", error);
+      res.status(500).json({ message: "Failed to generate report" });
+    }
+  });
+
+  app.post('/api/admin/send-report', isAuthenticated, async (req: any, res) => {
+    try {
+      const { recipient } = req.body;
+      const success = await weeklyScheduler.sendImmediateReport(recipient);
+      
+      if (success) {
+        res.json({ success: true, message: "Report sent successfully" });
+      } else {
+        res.status(500).json({ success: false, message: "Failed to send report" });
+      }
+    } catch (error) {
+      console.error("Error sending immediate report:", error);
+      res.status(500).json({ success: false, message: "Failed to send report" });
+    }
+  });
+
+  app.get('/api/admin/scheduler-status', isAuthenticated, async (req: any, res) => {
+    try {
+      const status = weeklyScheduler.getStatus();
+      const emailConfig = emailService.getConfigurationStatus();
+      
+      res.json({
+        ...status,
+        emailService: emailConfig
+      });
+    } catch (error) {
+      console.error("Error getting scheduler status:", error);
+      res.status(500).json({ message: "Failed to get status" });
+    }
+  });
+
+  app.post('/api/admin/test-email', isAuthenticated, async (req: any, res) => {
+    try {
+      const success = await weeklyScheduler.testEmailService();
+      
+      if (success) {
+        res.json({ success: true, message: "Test email sent successfully" });
+      } else {
+        res.json({ success: false, message: "Email service not configured or failed" });
+      }
+    } catch (error) {
+      console.error("Error testing email service:", error);
+      res.status(500).json({ success: false, message: "Failed to test email service" });
+    }
+  });
+
+  // Start the weekly performance monitoring scheduler
+  console.log('🚀 Starting AlphaForge performance monitoring...');
+  weeklyScheduler.startWeeklyReports();
 
   const httpServer = createServer(app);
   return httpServer;
