@@ -8,6 +8,8 @@ import {
   chatSessions,
   chatConversations,
   crmLeads,
+  fraudPrevention,
+  accountVerifications,
   type User,
   type UpsertUser,
   type Strategy,
@@ -26,6 +28,10 @@ import {
   type InsertChatConversation,
   type CrmLead,
   type InsertCrmLead,
+  type FraudPrevention,
+  type InsertFraudPrevention,
+  type AccountVerification,
+  type InsertAccountVerification,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, gte, lte, sql } from "drizzle-orm";
@@ -70,6 +76,12 @@ export interface IStorage {
   createChatConversation(conversation: InsertChatConversation): Promise<ChatConversation>;
   createCrmLead(lead: InsertCrmLead): Promise<CrmLead>;
   getCrmLeadBySessionId(sessionId: string): Promise<CrmLead | undefined>;
+
+  // Fraud prevention operations
+  recordFraudData(data: InsertFraudPrevention): Promise<FraudPrevention>;
+  getFraudDataByFingerprint(fingerprint: string): Promise<FraudPrevention[]>;
+  createAccountVerification(verification: InsertAccountVerification): Promise<AccountVerification>;
+  updateAccountVerification(id: string, updates: Partial<InsertAccountVerification>): Promise<AccountVerification>;
   
   // Portfolio analytics
   getPortfolioValue(userId: string): Promise<number>;
@@ -320,6 +332,43 @@ export class DatabaseStorage implements IStorage {
       .where(eq(crmLeads.sessionId, sessionId));
     
     return lead;
+  }
+
+  // Fraud prevention operations implementation
+  async recordFraudData(data: InsertFraudPrevention): Promise<FraudPrevention> {
+    const [record] = await db
+      .insert(fraudPrevention)
+      .values(data)
+      .returning();
+    
+    return record;
+  }
+
+  async getFraudDataByFingerprint(fingerprint: string): Promise<FraudPrevention[]> {
+    return await db
+      .select()
+      .from(fraudPrevention)
+      .where(eq(fraudPrevention.fingerprint, fingerprint))
+      .orderBy(desc(fraudPrevention.createdAt));
+  }
+
+  async createAccountVerification(verification: InsertAccountVerification): Promise<AccountVerification> {
+    const [record] = await db
+      .insert(accountVerifications)
+      .values(verification)
+      .returning();
+    
+    return record;
+  }
+
+  async updateAccountVerification(id: string, updates: Partial<InsertAccountVerification>): Promise<AccountVerification> {
+    const [record] = await db
+      .update(accountVerifications)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(accountVerifications.id, id))
+      .returning();
+    
+    return record;
   }
 }
 

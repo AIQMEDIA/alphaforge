@@ -9,6 +9,7 @@ import { marketDataService, PROVIDERS } from "./marketData";
 import { brokerService, BROKERS } from "./brokerApi";
 import { quantumOptimizer, QuantumProvider, QuantumAlgorithm } from "./quantumOptimizer";
 import { quantumAssistant } from "./quantumAssistant";
+import { fraudPreventionService } from "./fraudPrevention";
 import { insertStrategySchema, insertTransactionSchema, insertBacktestResultSchema, insertCrmLeadSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -445,11 +446,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Chatbot API Routes
   
-  // Get or create chat session
+  // Get or create chat session (with fraud protection)
   app.get('/api/chat/session', async (req: any, res) => {
     try {
       let sessionId = req.sessionID;
       let userId = req.isAuthenticated() ? req.user.claims.sub : undefined;
+      const ipAddress = req.ip || req.connection.remoteAddress;
+      const userAgent = req.get('User-Agent') || '';
+
+      // Generate device fingerprint from basic request data
+      const fingerprint = fraudPreventionService.generateFingerprint({
+        userAgent,
+        language: req.get('Accept-Language') || 'en',
+        platform: userAgent.includes('Windows') ? 'Win32' : userAgent.includes('Mac') ? 'MacIntel' : 'Linux',
+        screenResolution: '1920x1080', // Would be sent from frontend in real implementation
+        timezone: 'America/New_York', // Would be sent from frontend
+        cookieEnabled: true,
+        doNotTrack: req.get('DNT') || 'unspecified'
+      }, ipAddress);
+
+      // Perform fraud assessment for new sessions
+      const existingConversations = await storage.getChatConversations(sessionId);
+      if (existingConversations.length === 0) {
+        const fraudCheck = await fraudPreventionService.assessFraudRisk(
+          fingerprint,
+          ipAddress,
+          userAgent
+        );
+
+        // Record fraud data
+        await storage.recordFraudData({
+          fingerprint,
+          ipAddress,
+          userAgent,
+          sessionId,
+          userId: userId || undefined,
+          riskScore: fraudCheck.riskScore,
+          flaggedReason: fraudCheck.flaggedReasons.join(', ') || undefined,
+          isBlocked: fraudCheck.isBlocked
+        });
+
+        // Block high-risk users
+        if (fraudCheck.isBlocked) {
+          return res.status(403).json({ 
+            message: "Access denied. Please contact support if you believe this is an error.",
+            blocked: true
+          });
+        }
+      }
       
       const session = await storage.getOrCreateChatSession(sessionId, userId);
       res.json(session);
@@ -486,18 +530,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Send message to assistant
+  // Send message to assistant (with enhanced fraud protection)
   app.post('/api/chat/send', async (req: any, res) => {
     try {
       const { message, skillLevel } = req.body;
       let sessionId = req.sessionID;
       let userId = req.isAuthenticated() ? req.user.claims.sub : undefined;
+      const ipAddress = req.ip || req.connection.remoteAddress;
+      const userAgent = req.get('User-Agent') || '';
+
+      // Enhanced fraud checks for message sending
+      const fingerprint = fraudPreventionService.generateFingerprint({
+        userAgent,
+        language: req.get('Accept-Language') || 'en',
+        platform: userAgent.includes('Windows') ? 'Win32' : userAgent.includes('Mac') ? 'MacIntel' : 'Linux',
+        screenResolution: '1920x1080',
+        timezone: 'America/New_York',
+        cookieEnabled: true,
+        doNotTrack: req.get('DNT') || 'unspecified'
+      }, ipAddress);
+
+      // Check for rapid-fire messaging (bot behavior)
+      const recentConversations = await storage.getChatConversations(sessionId);
+      const lastMinute = new Date(Date.now() - 60000);
+      const recentMessages = recentConversations.filter(conv => 
+        conv.createdAt && new Date(conv.createdAt) > lastMinute
+      );
+
+      if (recentMessages.length >= 10) {
+        await storage.recordFraudData({
+          fingerprint,
+          ipAddress,
+          userAgent,
+          sessionId,
+          userId,
+          riskScore: 85,
+          flaggedReason: "Rapid messaging detected - possible bot",
+          isBlocked: true
+        });
+
+        return res.status(429).json({ 
+          message: "Too many messages sent. Please wait before sending another message.",
+          rateLimited: true
+        });
+      }
 
       // Get current session
       const session = await storage.getOrCreateChatSession(sessionId, userId);
       
-      // Check if user has exceeded query limit
-      if (!session.isUnlimited && session.queryCount >= 5) {
+      // Enhanced query limit with fraud consideration
+      let queryLimit = 5;
+      if (!session.isUnlimited && (session.queryCount || 0) >= queryLimit) {
+        // Check if this device/IP has been flagged for trial abuse
+        const trialEligibility = await fraudPreventionService.checkTrialEligibility(
+          fingerprint, ipAddress
+        );
+
+        if (!trialEligibility.eligible) {
+          return res.json({
+            response: `${trialEligibility.reason}. ${trialEligibility.alternativeOffer || 'Please contact support for assistance.'}`,
+            messageType: 'general',
+            limitReached: true,
+            trialBlocked: true
+          });
+        }
+
         return res.json({
           response: "You've reached your 5 free queries! Please share your contact details to continue with unlimited access to the Quantum Trading Assistant.",
           messageType: 'general',
@@ -519,7 +616,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update session query count if not unlimited
       if (!session.isUnlimited) {
         await storage.updateChatSession(session.id, {
-          queryCount: session.queryCount + 1,
+          queryCount: (session.queryCount || 0) + 1,
           skillLevel: skillLevel,
         });
       }
@@ -527,7 +624,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         response: aiResponse.response,
         messageType: aiResponse.messageType,
-        limitReached: !session.isUnlimited && (session.queryCount + 1) >= 5
+        limitReached: !session.isUnlimited && ((session.queryCount || 0) + 1) >= queryLimit
       });
 
     } catch (error) {
@@ -536,31 +633,134 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Submit CRM details to unlock unlimited access
+  // Submit CRM details to unlock unlimited access (with fraud protection)
   app.post('/api/chat/submit-crm', async (req: any, res) => {
     try {
       const crmData = insertCrmLeadSchema.parse(req.body);
       let sessionId = req.sessionID;
+      const ipAddress = req.ip || req.connection.remoteAddress;
+      const userAgent = req.get('User-Agent') || '';
 
-      // Get current session
+      // Enhanced fraud protection for CRM submissions
+      const fingerprint = fraudPreventionService.generateFingerprint({
+        userAgent,
+        language: req.get('Accept-Language') || 'en',
+        platform: userAgent.includes('Windows') ? 'Win32' : userAgent.includes('Mac') ? 'MacIntel' : 'Linux',
+        screenResolution: '1920x1080',
+        timezone: 'America/New_York', 
+        cookieEnabled: true,
+        doNotTrack: req.get('DNT') || 'unspecified'
+      }, ipAddress);
+
+      // Comprehensive fraud assessment with email and phone
+      const fraudCheck = await fraudPreventionService.assessFraudRisk(
+        fingerprint,
+        ipAddress,
+        userAgent,
+        crmData.email,
+        crmData.phone || undefined
+      );
+
+      // Record the fraud assessment
+      await storage.recordFraudData({
+        fingerprint,
+        ipAddress,
+        userAgent,
+        sessionId,
+        email: crmData.email,
+        phoneNumber: crmData.phone,
+        riskScore: fraudCheck.riskScore,
+        flaggedReason: fraudCheck.flaggedReasons.join(', '),
+        isBlocked: fraudCheck.isBlocked
+      });
+
+      // Handle high-risk submissions
+      if (fraudCheck.riskScore >= 50) {
+        // Still save the lead for manual review, but don't grant unlimited access immediately
+        await storage.createCrmLead({
+          ...crmData,
+          sessionId: sessionId,
+          status: fraudCheck.riskScore >= 70 ? 'flagged' : 'pending_review'
+        });
+
+        if (fraudCheck.isBlocked) {
+          return res.status(403).json({ 
+            message: "Your submission requires manual verification. Our team will contact you within 24 hours.",
+            requiresVerification: true
+          });
+        }
+
+        // Medium risk - require email verification
+        return res.json({
+          success: true,
+          message: "Thank you! Please check your email to verify your account for unlimited access.",
+          requiresEmailVerification: true
+        });
+      }
+
+      // Low risk - proceed normally
       const session = await storage.getOrCreateChatSession(sessionId);
       
+      // Verify email and phone if provided
+      const emailValid = await fraudPreventionService.verifyEmail(crmData.email);
+      const phoneValid = crmData.phone ? await fraudPreventionService.verifyPhone(crmData.phone) : true;
+
+      if (!emailValid) {
+        return res.status(400).json({ 
+          message: "Email address is already in use or invalid. Please use a different email.",
+          emailError: true
+        });
+      }
+
+      if (!phoneValid) {
+        return res.status(400).json({ 
+          message: "Phone number has been used too many times. Please contact support.",
+          phoneError: true
+        });
+      }
+
       // Save CRM lead
       await storage.createCrmLead({
         ...crmData,
-        sessionId: session.id
+        sessionId: session.id,
+        status: 'qualified'
       });
 
-      // Grant unlimited access
+      // Create account verification record
+      await storage.createAccountVerification({
+        email: crmData.email,
+        phone: crmData.phone,
+        emailVerified: true, // Auto-verify for low-risk users
+        phoneVerified: !!crmData.phone,
+        verificationScore: 100 - fraudCheck.riskScore,
+        verificationMethod: 'crm_form'
+      });
+
+      // Grant unlimited access for verified, low-risk users
       await storage.updateChatSession(session.id, {
         isUnlimited: true
       });
 
-      res.json({ success: true, message: "Thank you! You now have unlimited access." });
+      res.json({ 
+        success: true, 
+        message: "Thank you! You now have unlimited access to the Quantum Trading Assistant."
+      });
 
     } catch (error) {
       console.error("Error submitting CRM data:", error);
       res.status(500).json({ message: "Failed to submit details" });
+    }
+  });
+
+  // Fraud prevention admin routes (protected)
+  app.get('/api/admin/fraud-report', isAuthenticated, async (req: any, res) => {
+    try {
+      // Only allow admin users (you could add role checking here)
+      const report = await fraudPreventionService.generateFraudReport(30);
+      res.json(report);
+    } catch (error) {
+      console.error("Error generating fraud report:", error);
+      res.status(500).json({ message: "Failed to generate report" });
     }
   });
 

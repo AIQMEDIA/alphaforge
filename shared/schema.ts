@@ -81,6 +81,41 @@ export const crmLeads = pgTable("crm_leads", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Fraud prevention tracking table
+export const fraudPrevention = pgTable("fraud_prevention", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  fingerprint: varchar("fingerprint").notNull(), // Browser fingerprint
+  ipAddress: varchar("ip_address").notNull(),
+  userAgent: varchar("user_agent"),
+  sessionId: varchar("session_id"),
+  userId: varchar("user_id"),
+  email: varchar("email"),
+  phoneNumber: varchar("phone_number"),
+  deviceId: varchar("device_id"),
+  browserFingerprint: jsonb("browser_fingerprint"), // Canvas, WebGL, etc.
+  riskScore: integer("risk_score").default(0), // 0-100, higher = more suspicious
+  flaggedReason: varchar("flagged_reason"),
+  isBlocked: boolean("is_blocked").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Account verification table
+export const accountVerifications = pgTable("account_verifications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id"),
+  email: varchar("email").notNull(),
+  phone: varchar("phone"),
+  emailVerified: boolean("email_verified").default(false),
+  phoneVerified: boolean("phone_verified").default(false),
+  idVerificationStatus: varchar("id_verification_status").default("pending"), // pending, verified, rejected
+  idDocumentType: varchar("id_document_type"), // passport, drivers_license, national_id
+  verificationScore: integer("verification_score").default(0),
+  verificationMethod: varchar("verification_method"), // email, sms, document, manual
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Trading strategies
 export const strategies = pgTable("strategies", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -256,6 +291,15 @@ export const insertChatConversationSchema = createInsertSchema(chatConversations
 export type CrmLead = typeof crmLeads.$inferSelect;
 export type InsertCrmLead = typeof crmLeads.$inferInsert;
 export const insertCrmLeadSchema = createInsertSchema(crmLeads).omit({ id: true, createdAt: true, updatedAt: true });
+
+// Fraud prevention types
+export type FraudPrevention = typeof fraudPrevention.$inferSelect;
+export type InsertFraudPrevention = typeof fraudPrevention.$inferInsert;
+export const insertFraudPreventionSchema = createInsertSchema(fraudPrevention).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type AccountVerification = typeof accountVerifications.$inferSelect;
+export type InsertAccountVerification = typeof accountVerifications.$inferInsert;
+export const insertAccountVerificationSchema = createInsertSchema(accountVerifications).omit({ id: true, createdAt: true, updatedAt: true });
 export type Strategy = typeof strategies.$inferSelect;
 export type InsertStrategy = typeof strategies.$inferInsert;
 export type Position = typeof positions.$inferSelect;
