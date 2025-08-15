@@ -1,0 +1,52 @@
+You are an experienced Security QA Automation Engineer tasked with designing a **comprehensive automated test suite** to validate and stress-test a multi-layered fraud prevention system for a Replit-based web application.
+
+System Capabilities to Test:
+- Device fingerprinting (browser/device attributes: screen resolution, OS, timezone, user agent, canvas fingerprint, etc.)
+- IP and geo-location tracking
+- Behavioral analysis (messaging rate, mouse/tap patterns, time-on-task)
+- Risk scoring system (0-100) with action tiers (automated blocks at 70+)
+- Email and phone verification with usage limits
+- Trial eligibility checks to block repeat abuse
+- Rate limiting for suspicious rapid messaging
+- Progressive restriction logic (verification, manual review)
+- Database logging in `fraud_prevention` and `account_verifications` tables
+- Admin fraud reporting system with alert triggers
+
+Your task is to generate:
+
+1. **Automated Test Plan**
+   - Test each layer of the fraud prevention logic individually AND in combination.
+   - Specify expected outcomes for legitimate users vs. fraudulent users.
+
+2. **Security Scenario Coverage** (based on checklist below):
+   - **Device Fingerprint Evasion**: VPN usage, incognito, anti-fingerprint extensions.
+   - **IP Spoofing/Cycling**: Proxy rotation, random IP injection.
+   - **Behavioral Mimicry**: Slow, human-like actions vs. rapid bot bursts.
+   - **Phone Verification Edge Cases**: Virtual/SMS services, SIM swaps, number recycling.
+   - **Disposable Email Robustness**: Test rare disposable domains, alias hacks (gmail dots/plus).
+   - **Rate Limiting Under Load**: Concurrent high-velocity message submissions.
+   - **Shared Network Scenarios**: Multiple legit users behind one IP.
+   - **Manual Review Safeguards**: Attempt to bypass through social engineering or poor workflow.
+   - **Admin Alert Functionality**: Ensure alerts trigger and are actionable in real time.
+   - **Database Integrity Tests**: Inject malformed or high-volume records; ensure accurate logging.
+   - **Privacy & Compliance Checks**: Data handling meets GDPR/CCPA and erasure requests.
+   - **Blocking/Fallback Handling**: Simulate false positives, network issues, unblock flows.
+   - **Load & Stress Testing**: Simulate peak-user spikes and monitor latency/block accuracy.
+
+3. **Automation Blueprint**
+   - Recommend automation frameworks (e.g., Playwright, Cypress, Locust, JMeter, custom Puppeteer scripts).
+   - Define test data sets (legit vs. malicious profiles, IP lists, device signatures).
+   - Include mock transactions for database and API validation.
+
+4. **Execution Plan**
+   - Include modular test cases that can be run independently or as full regression.
+   - Provide tagging system in scripts (e.g., `@device`, `@ip`, `@behavior`) for targeted runs.
+   - Outline CI/CD integration so tests run pre- and post-deployment.
+
+5. **Reporting**
+   - Detail how to log results and generate actionable fraud-testing reports.
+   - Include severity scoring for discovered vulnerabilities.
+
+Output Requirement:
+- Structured in **Markdown** with sections for Test Cases, Automation Scripts, Data Requirements, and Reporting Framework.
+- Include example pseudocode/test code snippets where possible.
