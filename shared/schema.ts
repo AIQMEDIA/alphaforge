@@ -37,6 +37,46 @@ export const users = pgTable("users", {
   stripeSubscriptionId: varchar("stripe_subscription_id"),
   subscriptionStatus: varchar("subscription_status").default("trial"), // trial, active, canceled, expired
   trialEndsAt: timestamp("trial_ends_at"),
+  tradingExperience: varchar("trading_experience"), // beginner, intermediate, advanced, professional
+  role: varchar("role"), // trader, analyst, portfolio_manager, student, other
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Chatbot sessions and query tracking
+export const chatSessions = pgTable("chat_sessions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id),
+  sessionId: varchar("session_id").notNull(), // browser session or anonymous ID
+  queryCount: integer("query_count").default(0),
+  isUnlimited: boolean("is_unlimited").default(false), // true if user has subscription or completed CRM
+  skillLevel: varchar("skill_level").default("beginner"), // beginner, professional
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Chatbot conversations
+export const chatConversations = pgTable("chat_conversations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: varchar("session_id").references(() => chatSessions.id).notNull(),
+  userMessage: text("user_message").notNull(),
+  botResponse: text("bot_response").notNull(),
+  messageType: varchar("message_type").default("general"), // general, portfolio_advice, risk_alert, quantum_analysis
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// CRM leads for chatbot users
+export const crmLeads = pgTable("crm_leads", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: varchar("session_id").references(() => chatSessions.id),
+  name: varchar("name").notNull(),
+  email: varchar("email").notNull(),
+  role: varchar("role").notNull(),
+  tradingExperience: varchar("trading_experience").notNull(),
+  company: varchar("company"),
+  phone: varchar("phone"),
+  leadSource: varchar("lead_source").default("chatbot"),
+  status: varchar("status").default("new"), // new, contacted, qualified, converted
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -126,6 +166,33 @@ export const usersRelations = relations(users, ({ many }) => ({
   transactions: many(transactions),
   backtestResults: many(backtestResults),
   riskMetrics: many(riskMetrics),
+  chatSessions: many(chatSessions),
+}));
+
+export const chatSessionsRelations = relations(chatSessions, ({ one, many }) => ({
+  user: one(users, {
+    fields: [chatSessions.userId],
+    references: [users.id],
+  }),
+  conversations: many(chatConversations),
+  crmLead: one(crmLeads, {
+    fields: [chatSessions.id],
+    references: [crmLeads.sessionId],
+  }),
+}));
+
+export const chatConversationsRelations = relations(chatConversations, ({ one }) => ({
+  session: one(chatSessions, {
+    fields: [chatConversations.sessionId],
+    references: [chatSessions.id],
+  }),
+}));
+
+export const crmLeadsRelations = relations(crmLeads, ({ one }) => ({
+  session: one(chatSessions, {
+    fields: [crmLeads.sessionId],
+    references: [chatSessions.id],
+  }),
 }));
 
 export const strategiesRelations = relations(strategies, ({ one, many }) => ({
@@ -176,6 +243,19 @@ export const riskMetricsRelations = relations(riskMetrics, ({ one }) => ({
 // Schema exports
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
+
+// Chatbot type definitions
+export type ChatSession = typeof chatSessions.$inferSelect;
+export type InsertChatSession = typeof chatSessions.$inferInsert;
+export const insertChatSessionSchema = createInsertSchema(chatSessions);
+
+export type ChatConversation = typeof chatConversations.$inferSelect;
+export type InsertChatConversation = typeof chatConversations.$inferInsert;
+export const insertChatConversationSchema = createInsertSchema(chatConversations);
+
+export type CrmLead = typeof crmLeads.$inferSelect;
+export type InsertCrmLead = typeof crmLeads.$inferInsert;
+export const insertCrmLeadSchema = createInsertSchema(crmLeads).omit({ id: true, createdAt: true, updatedAt: true });
 export type Strategy = typeof strategies.$inferSelect;
 export type InsertStrategy = typeof strategies.$inferInsert;
 export type Position = typeof positions.$inferSelect;

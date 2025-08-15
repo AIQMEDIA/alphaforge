@@ -16,12 +16,16 @@ import Analytics from "@/pages/analytics";
 import Subscribe from "@/pages/subscribe";
 import Settings from "@/pages/settings";
 import QuantumOptimization from "@/pages/quantum-optimization";
+import QuantumAssistant from "@/pages/quantum-assistant";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
 
   return (
     <Switch>
+      {/* Public routes available to everyone */}
+      <Route path="/quantum-assistant" component={QuantumAssistant} />
+      
       {isLoading || !isAuthenticated ? (
         <Route path="/" component={Landing} />
       ) : (

@@ -1,0 +1,70 @@
+You are building **AlphaForge Quantum Trading Assistant**, an interactive chatbot supporting both experienced and beginner traders in leveraging quantum-powered portfolio optimization.
+
+GOAL:
+Develop a conversational AI platform that:
+- Educates and guides traders on quantum finance concepts (VQE, QAOA, quantum vs classical methods).
+- Integrates with live/historical market data feeds and trading execution APIs (e.g., Alpaca).
+- Provides risk alerts, performance analytics, optimization advice.
+- Tailors onboarding to beginner OR pro trader skill level.
+- Includes a **strict access control system**:
+    - Allow **5 free queries** before limiting further responses.
+    - When the limit is reached, prompt user to submit CRM details (Name, Email, Role, Trading Experience) or sign in with an active subscription.
+    - After verification of CRM data or subscription, re-enable unlimited access.
+
+FEATURE REQUIREMENTS:
+1. **Quantum Portfolio Optimization Guidance**
+   - Step-by-step portfolio setup and quantum-vs-classical comparisons.
+   - Accessible explanations for educational purposes.
+
+2. **Real-Time Market Data & Trading**
+   - Secure API link to data providers & Alpaca.
+   - Trade execution on command, switch between paper/live modes.
+
+3. **Performance Analytics**
+   - ROI, Sharpe, drawdown, volatility metrics.
+   - Comparison charts: quantum vs classical.
+
+4. **Risk Management Tools**
+   - Alerts for volatility/concentration breaches.
+   - Market stress-test simulations.
+
+5. **Skill-Level Onboarding**
+   - Beginner Mode → Fundamentals, safe sample trades, glossary.
+   - Pro Mode → Advanced features, custom API hooks.
+
+6. **Case Study & Strategy Explorer**
+   - Search real quantum trading wins.
+   - Suggest strategies based on conditions/goals.
+
+7. **Access Control Workflow**
+   - Track user query count in session (e.g., via JSON user profile).
+   - After 5 queries, block interactions until:
+       a) CRM form completed (Name, Email, Role, Experience).
+       b) Subscription verified through payment gateway or CRM lookup.
+   - Store CRM in secure database for follow-up engagement.
+   - Once verified → reset query count, grant unlimited usage.
+
+8. **24/7 Help**
+   - Context-aware trading/platform/quantum Q&A.
+   - Route complex questions to human expert if needed.
+
+INTERACTION STYLE:
+- Professional but clear; uses visuals & concise charts.
+- Always explains reasoning behind quantum results.
+
+OUTPUT FORMATS:
+- Text explanations
+- Calculated live metrics
+- Chart visualizations
+- Risk alert notifications
+
+TECHNICAL GUIDELINES:
+- Modular architecture for Replit-hosted deployment.
+- Integrate API key handling securely.
+- Maintain logs for analytics & CRM integration.
+
+TASK:
+Generate:
+- Conversation design flows (including free-limit → CRM/signup flow).
+- JSON structure for storing user profiles & query count.
+- API templates for Alpaca, CRM storage, and subscription checks.

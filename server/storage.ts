@@ -5,6 +5,9 @@ import {
   transactions,
   backtestResults,
   riskMetrics,
+  chatSessions,
+  chatConversations,
+  crmLeads,
   type User,
   type UpsertUser,
   type Strategy,
@@ -17,6 +20,12 @@ import {
   type InsertBacktestResult,
   type RiskMetric,
   type InsertRiskMetric,
+  type ChatSession,
+  type InsertChatSession,
+  type ChatConversation,
+  type InsertChatConversation,
+  type CrmLead,
+  type InsertCrmLead,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, gte, lte, sql } from "drizzle-orm";
@@ -53,6 +62,14 @@ export interface IStorage {
   getUserRiskMetrics(userId: string, startDate?: Date, endDate?: Date): Promise<RiskMetric[]>;
   createRiskMetric(metric: InsertRiskMetric & { userId: string }): Promise<RiskMetric>;
   getLatestRiskMetric(userId: string): Promise<RiskMetric | undefined>;
+
+  // Chatbot operations
+  getOrCreateChatSession(sessionId: string, userId?: string): Promise<ChatSession>;
+  updateChatSession(id: string, updates: Partial<InsertChatSession>): Promise<ChatSession>;
+  getChatConversations(sessionId: string): Promise<ChatConversation[]>;
+  createChatConversation(conversation: InsertChatConversation): Promise<ChatConversation>;
+  createCrmLead(lead: InsertCrmLead): Promise<CrmLead>;
+  getCrmLeadBySessionId(sessionId: string): Promise<CrmLead | undefined>;
   
   // Portfolio analytics
   getPortfolioValue(userId: string): Promise<number>;
@@ -239,6 +256,70 @@ export class DatabaseStorage implements IStorage {
       .from(riskMetrics)
       .where(and(eq(riskMetrics.userId, userId), gte(riskMetrics.date, startDate), lte(riskMetrics.date, endDate)))
       .orderBy(riskMetrics.date);
+  }
+
+  // Chatbot operations implementation
+  async getOrCreateChatSession(sessionId: string, userId?: string): Promise<ChatSession> {
+    const [existing] = await db.select().from(chatSessions).where(eq(chatSessions.sessionId, sessionId));
+    
+    if (existing) {
+      return existing;
+    }
+
+    const [session] = await db.insert(chatSessions).values({
+      sessionId,
+      userId,
+      queryCount: 0,
+      isUnlimited: !!userId, // Give unlimited access to authenticated users initially
+      skillLevel: 'beginner'
+    }).returning();
+    
+    return session;
+  }
+
+  async updateChatSession(id: string, updates: Partial<InsertChatSession>): Promise<ChatSession> {
+    const [session] = await db
+      .update(chatSessions)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(chatSessions.id, id))
+      .returning();
+    
+    return session;
+  }
+
+  async getChatConversations(sessionId: string): Promise<ChatConversation[]> {
+    return await db
+      .select()
+      .from(chatConversations)
+      .where(eq(chatConversations.sessionId, sessionId))
+      .orderBy(chatConversations.createdAt);
+  }
+
+  async createChatConversation(conversation: InsertChatConversation): Promise<ChatConversation> {
+    const [conv] = await db
+      .insert(chatConversations)
+      .values(conversation)
+      .returning();
+    
+    return conv;
+  }
+
+  async createCrmLead(lead: InsertCrmLead): Promise<CrmLead> {
+    const [crmLead] = await db
+      .insert(crmLeads)
+      .values(lead)
+      .returning();
+    
+    return crmLead;
+  }
+
+  async getCrmLeadBySessionId(sessionId: string): Promise<CrmLead | undefined> {
+    const [lead] = await db
+      .select()
+      .from(crmLeads)
+      .where(eq(crmLeads.sessionId, sessionId));
+    
+    return lead;
   }
 }
 

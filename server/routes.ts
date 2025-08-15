@@ -8,7 +8,8 @@ import { setupAuth, isAuthenticated } from "./replitAuth";
 import { marketDataService, PROVIDERS } from "./marketData";
 import { brokerService, BROKERS } from "./brokerApi";
 import { quantumOptimizer, QuantumProvider, QuantumAlgorithm } from "./quantumOptimizer";
-import { insertStrategySchema, insertTransactionSchema, insertBacktestResultSchema } from "@shared/schema";
+import { quantumAssistant } from "./quantumAssistant";
+import { insertStrategySchema, insertTransactionSchema, insertBacktestResultSchema, insertCrmLeadSchema } from "@shared/schema";
 import { z } from "zod";
 
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -439,6 +440,127 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true, provider });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Chatbot API Routes
+  
+  // Get or create chat session
+  app.get('/api/chat/session', async (req: any, res) => {
+    try {
+      let sessionId = req.sessionID;
+      let userId = req.isAuthenticated() ? req.user.claims.sub : undefined;
+      
+      const session = await storage.getOrCreateChatSession(sessionId, userId);
+      res.json(session);
+    } catch (error) {
+      console.error("Error getting chat session:", error);
+      res.status(500).json({ message: "Failed to get chat session" });
+    }
+  });
+
+  // Get conversation history
+  app.get('/api/chat/history/:sessionId', async (req, res) => {
+    try {
+      const { sessionId } = req.params;
+      const conversations = await storage.getChatConversations(sessionId);
+      
+      // Transform to frontend format
+      const messages = conversations.map(conv => ({
+        id: conv.id,
+        message: conv.userMessage,
+        sender: 'user',
+        timestamp: conv.createdAt,
+      })).concat(conversations.map(conv => ({
+        id: conv.id + '_bot',
+        message: conv.botResponse,
+        sender: 'bot',
+        timestamp: conv.createdAt,
+        messageType: conv.messageType,
+      }))).sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+      
+      res.json(messages);
+    } catch (error) {
+      console.error("Error getting chat history:", error);
+      res.status(500).json({ message: "Failed to get chat history" });
+    }
+  });
+
+  // Send message to assistant
+  app.post('/api/chat/send', async (req: any, res) => {
+    try {
+      const { message, skillLevel } = req.body;
+      let sessionId = req.sessionID;
+      let userId = req.isAuthenticated() ? req.user.claims.sub : undefined;
+
+      // Get current session
+      const session = await storage.getOrCreateChatSession(sessionId, userId);
+      
+      // Check if user has exceeded query limit
+      if (!session.isUnlimited && session.queryCount >= 5) {
+        return res.json({
+          response: "You've reached your 5 free queries! Please share your contact details to continue with unlimited access to the Quantum Trading Assistant.",
+          messageType: 'general',
+          limitReached: true
+        });
+      }
+
+      // Generate AI response using quantum assistant
+      const aiResponse = quantumAssistant.generateResponse(message, skillLevel, sessionId);
+
+      // Save conversation
+      await storage.createChatConversation({
+        sessionId: session.id,
+        userMessage: message,
+        botResponse: aiResponse.response,
+        messageType: aiResponse.messageType
+      });
+
+      // Update session query count if not unlimited
+      if (!session.isUnlimited) {
+        await storage.updateChatSession(session.id, {
+          queryCount: session.queryCount + 1,
+          skillLevel: skillLevel,
+        });
+      }
+
+      res.json({
+        response: aiResponse.response,
+        messageType: aiResponse.messageType,
+        limitReached: !session.isUnlimited && (session.queryCount + 1) >= 5
+      });
+
+    } catch (error) {
+      console.error("Error processing chat message:", error);
+      res.status(500).json({ message: "Failed to process message" });
+    }
+  });
+
+  // Submit CRM details to unlock unlimited access
+  app.post('/api/chat/submit-crm', async (req: any, res) => {
+    try {
+      const crmData = insertCrmLeadSchema.parse(req.body);
+      let sessionId = req.sessionID;
+
+      // Get current session
+      const session = await storage.getOrCreateChatSession(sessionId);
+      
+      // Save CRM lead
+      await storage.createCrmLead({
+        ...crmData,
+        sessionId: session.id
+      });
+
+      // Grant unlimited access
+      await storage.updateChatSession(session.id, {
+        isUnlimited: true
+      });
+
+      res.json({ success: true, message: "Thank you! You now have unlimited access." });
+
+    } catch (error) {
+      console.error("Error submitting CRM data:", error);
+      res.status(500).json({ message: "Failed to submit details" });
     }
   });
 
