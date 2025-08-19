@@ -171,7 +171,7 @@ def test_sql_injection_protection():
             "tradingExperience": injection
         }
         
-        r = requests.post(f"{API_API}/crm/submit", json=crm_data, headers=headers)
+        r = requests.post(f"{API_BASE}/crm/submit", json=crm_data, headers=headers)
         # Should handle injection attempts safely
         assert r.status_code in [200, 400, 422], f"SQL injection not handled: {injection}"
 
