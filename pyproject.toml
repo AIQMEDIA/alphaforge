@@ -1,0 +1,12 @@
+[project]
+name = "repl-nix-workspace"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.11"
+dependencies = [
+    "faker>=37.5.3",
+    "playwright>=1.54.0",
+    "pytest>=8.4.1",
+    "pytest-html>=4.1.1",
+    "requests>=2.32.5",
+]

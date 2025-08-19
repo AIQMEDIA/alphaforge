@@ -1,0 +1,194 @@
+Here’s a thorough, modular testing code suite (using pytest for Python backend/logic and Playwright for end-to-end browser flows) that you can run in Replit to rigorously challenge AlphaForge—especially for common failure modes, UI issues, security glitches, and fraud-bypass attempts.
+The scaffolding covers API, UI, fraud checks, CRM gating, and critical usage paths, and is written for clarity/maintainability so it’s easy to expand after handoff.
+
+📁 Directory Structure
+text
+/tests
+    test_api_core.py
+    test_marketplace.py
+    test_quantum_lab.py
+    test_security_fraud.py
+    test_end2end_playwright.py
+playwright.config.js
+requirements.txt
+requirements.txt
+text
+pytest
+requests
+playwright
+faker
+test_api_core.py
+python
+import pytest
+import requests
+
+API_BASE = "http://localhost:8000/api"
+FAKE_TOKEN = "demo_token"  # Use your Replit Auth token here
+
+def get_headers():
+    return {"Authorization": f"Bearer {FAKE_TOKEN}"}
+
+def test_api_status():
+    r = requests.get(f"{API_BASE}/status", headers=get_headers())
+    assert r.status_code == 200
+    assert "uptime" in r.json()
+
+def test_markets_listing():
+    r = requests.get(f"{API_BASE}/markets", headers=get_headers())
+    assert r.status_code == 200
+    assert isinstance(r.json(), list)
+
+def test_portfolio_crud():
+    # Create
+    data = {"name": "Test Portfolio", "assets": ["AAPL", "MSFT"]}
+    r = requests.post(f"{API_BASE}/portfolio", json=data, headers=get_headers())
+    assert r.status_code == 201
+    pid = r.json().get("id")
+
+    # Retrieve
+    r = requests.get(f"{API_BASE}/portfolio/{pid}", headers=get_headers())
+    assert r.status_code == 200
+    assert r.json()["name"] == "Test Portfolio"
+
+    # Delete
+    r = requests.delete(f"{API_BASE}/portfolio/{pid}", headers=get_headers())
+    assert r.status_code == 204
+test_marketplace.py
+python
+import pytest
+import requests
+from faker import Faker
+
+API_BASE = "http://localhost:8000/api"
+fake = Faker()
+
+def test_marketplace_strategy_share_and_clone():
+    # Post strategy as user #1
+    strat = {
+        "name": fake.catch_phrase(),
+        "script": "quantum_strategy_vqe()",
+        "description": fake.text(),
+    }
+    headers = {"Authorization": "Bearer user1_token"}
+    r = requests.post(f"{API_BASE}/marketplace/strategies", json=strat, headers=headers)
+    assert r.status_code == 201
+    sid = r.json()["id"]
+
+    # Clone as user #2
+    headers2 = {"Authorization": "Bearer user2_token"}
+    r = requests.post(f"{API_BASE}/marketplace/strategies/{sid}/clone", headers=headers2)
+    assert r.status_code == 201
+
+def test_marketplace_leaderboard():
+    r = requests.get(f"{API_BASE}/marketplace/leaderboard")
+    assert r.status_code == 200
+    assert isinstance(r.json(), list)
+test_quantum_lab.py
+python
+import pytest
+import requests
+
+API_BASE = "http://localhost:8000/api"
+
+def test_quantum_circuit_sandbox():
+    payload = {
+        "language": "python",
+        "code": "from qiskit import *\nQuantumCircuit(2).h(0)"
+    }
+    headers = {"Authorization": "Bearer valid_user_token"}
+    r = requests.post(f"{API_BASE}/quantlab/execute", json=payload, headers=headers)
+    assert r.status_code in (200, 400)  # May reject for resource limits
+
+def test_quantum_invalid_code_sandbox():
+    # Should not crash backend or leak info on invalid code
+    payload = {"language": "python", "code": "raise Exception('hack')"}
+    headers = {"Authorization": "Bearer valid_user_token"}
+    r = requests.post(f"{API_BASE}/quantlab/execute", json=payload, headers=headers)
+    assert r.status_code in (400, 422, 500)
+test_security_fraud.py
+python
+import pytest
+import requests
+
+API_BASE = "http://localhost:8000/api"
+
+def test_fraud_trial_eligibility():
+    # Simulated multiple signups from same device/IP
+    device_id = "FAKE_FINGERPRINT"
+    headers = {"X-Device-ID": device_id}
+    for _ in range(5):
+        r = requests.post(f"{API_BASE}/auth/signup", json={"email": f"fraud{_}@disposable.com"}, headers=headers)
+    # The 4th-5th attempt should be blocked or throttled
+    r = requests.post(f"{API_BASE}/auth/signup", json={"email": "fraud999@disposable.com"}, headers=headers)
+    assert r.status_code in (403, 429)
+
+def test_rate_limit_bots():
+    headers = {"Authorization": "Bearer valid_user_token"}
+    for _ in range(12):
+        r = requests.post(f"{API_BASE}/marketdata/price", json={"symbol": "AAPL"}, headers=headers)
+    # Should block further attempts after threshold
+    r = requests.post(f"{API_BASE}/marketdata/price", json={"symbol": "TSLA"}, headers=headers)
+    assert r.status_code in (429, 403)
+
+def test_disposable_email_block():
+    headers = {"Authorization": "Bearer valid_user_token"}
+    r = requests.post(f"{API_BASE}/profile/update_email", json={"email": "test@mailinator.com"}, headers=headers)
+    assert r.status_code in (400, 403)
+test_end2end_playwright.py
+This file uses Playwright for real browser-based E2E flow.
+First, run:
+
+shell
+playwright install
+Then use:
+
+python
+import pytest
+from playwright.sync_api import sync_playwright
+
+def test_signup_and_quantum_trade_flow():
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page()
+        page.goto("http://localhost:8000")
+        # Simulate signup
+        page.click("text=Sign Up")
+        page.fill("input[name='email']", "e2euser@example.com")
+        page.fill("input[name='password']", "StrongPassword123")
+        page.click("text=Register")
+        # Ensure portfolio creation
+        page.click("text=Create Portfolio")
+        page.fill("input[name='name']", "E2E Quantum")
+        page.click("text=Save")
+        # Run quantum optimization
+        page.click("text=Quantum Optimize")
+        page.wait_for_selector("text=Optimization Complete", timeout=15000)
+        # Confirm results shown
+        assert page.is_visible("text=Expected Return")
+        browser.close()
+How to Run Everything
+Install dependencies:
+
+shell
+pip install pytest requests playwright faker
+playwright install
+Run tests (API/unit):
+
+shell
+pytest tests/
+Run end-to-end (UI/UX):
+
+shell
+pytest tests/test_end2end_playwright.py
+⚡️ What this suite covers:
+API stability
+
+Strategy marketplace flows
+
+Quantum circuit lab & sandbox safety
+
+Fraud, email, bot, and trial abuse checks
+
+End-user UI onboarding and trading flows
+
+Expand/parametrize as your use-cases grow, but this baseline helps guarantee no embarrassing errors or fraud exploits surface when demonstrating AlphaForge to trading professionals! If you want Replit JSON database mocks or CI/CD integration next, let me know.
