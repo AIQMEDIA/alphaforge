@@ -10,9 +10,10 @@ import { RiskMetrics } from "@/components/dashboard/risk-metrics";
 import { ActiveStrategies } from "@/components/dashboard/active-strategies";
 import { RecentActivity } from "@/components/dashboard/recent-activity";
 import { UpgradeModal } from "@/components/dashboard/upgrade-modal";
+import { ObservabilityStatus } from "@/components/dashboard/observability-status";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Plus, Download, Settings, History, FileDown } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Plus, Download, Settings, History, FileDown, Activity, CheckCircle } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -97,7 +98,7 @@ export default function Dashboard() {
                   Portfolio Overview
                 </h2>
                 <p className="text-gray-600 dark:text-gray-400">
-                  Real-time performance and analytics
+                  Real-time performance and analytics powered by Arize AI observability
                 </p>
               </div>
               <div className="flex space-x-3">
@@ -138,6 +139,53 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <ActiveStrategies />
             <RecentActivity />
+          </div>
+
+          {/* Enterprise Features */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <ObservabilityStatus />
+            
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
+                    <Activity className="h-5 w-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Quantum Computing</h3>
+                    <p className="text-sm text-muted-foreground">IBM, Google, Amazon</p>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Advanced portfolio optimization using quantum algorithms
+                </p>
+                <Link href="/quantum">
+                  <Button variant="outline" size="sm" className="w-full">
+                    Explore Quantum
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Enterprise Security</h3>
+                    <p className="text-sm text-muted-foreground">Bank-level protection</p>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Advanced fraud prevention and institutional security
+                </p>
+                <Button variant="outline" size="sm" className="w-full">
+                  Security Details
+                </Button>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Quick Actions Floating Panel */}

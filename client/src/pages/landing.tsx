@@ -36,12 +36,12 @@ export default function Landing() {
   ];
 
   const benefits = [
-    "30-day free trial with full features",
-    "Paper trading for risk-free testing",
-    "Real-time portfolio monitoring",
-    "Institutional-grade risk controls",
-    "Transparent audit trail",
-    "Export compliance reports"
+    "60-day free trial with full features",
+    "Arize AI enterprise observability integration",
+    "Quantum computing portfolio optimization",
+    "Real-time portfolio monitoring with ML insights",
+    "Institutional-grade risk controls and fraud prevention",
+    "Transparent audit trail and compliance exports"
   ];
 
   return (
@@ -87,6 +87,7 @@ export default function Landing() {
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
             Build, backtest, and deploy trading strategies with institutional-grade risk management. 
+            Powered by enterprise observability from Arize AI, trusted by Uber and Flipkart.
             Start your 30-day free trial and experience the difference of transparent, reliable quantitative trading.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -137,17 +138,67 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Enterprise Partnerships Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-dark-100">
+        <div className="max-w-7xl mx-auto text-center">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
+            Powered by Enterprise Partners
+          </h2>
+          <p className="text-lg text-gray-600 dark:text-gray-300 mb-12">
+            AlphaForge leverages best-in-class enterprise observability and infrastructure
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <Card className="p-6 hover:shadow-lg transition-shadow">
+              <CardContent className="text-center">
+                <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <BarChart3 className="h-8 w-8 text-blue-600" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Arize AI Observability</h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Enterprise-grade monitoring trusted by Uber, Flipkart, and 6,000+ developers
+                </p>
+                <Badge variant="secondary">$45M ARR Partner</Badge>
+              </CardContent>
+            </Card>
+            <Card className="p-6 hover:shadow-lg transition-shadow">
+              <CardContent className="text-center">
+                <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <Bot className="h-8 w-8 text-purple-600" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Quantum Computing</h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  IBM Quantum, Google Cirq, and Amazon Braket integration
+                </p>
+                <Badge variant="secondary">3 Major Providers</Badge>
+              </CardContent>
+            </Card>
+            <Card className="p-6 hover:shadow-lg transition-shadow">
+              <CardContent className="text-center">
+                <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <Shield className="h-8 w-8 text-green-600" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Institutional Security</h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Multi-layered fraud prevention and enterprise-grade security
+                </p>
+                <Badge variant="secondary">Bank-Level Protection</Badge>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* Benefits Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
-                Why Choose QuantBot Pro?
+                Why Choose AlphaForge?
               </h2>
               <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
                 Unlike typical trading platforms, we prioritize reliability, transparency, and robust risk management. 
-                Our platform addresses common industry shortcomings with proven methodologies.
+                Built with enterprise partnerships and proven methodologies from day one.
               </p>
               <div className="space-y-4">
                 {benefits.map((benefit, index) => (
