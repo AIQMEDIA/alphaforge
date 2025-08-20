@@ -13,6 +13,14 @@ import { fraudPreventionService } from "./fraudPrevention";
 import { weeklyScheduler } from './weeklyScheduler.js';
 import { emailService } from './emailService.js';
 import { insertStrategySchema, insertTransactionSchema, insertBacktestResultSchema, insertCrmLeadSchema } from "@shared/schema";
+import {
+  traceUserAction,
+  traceChatInteraction,
+  traceFraudDetection,
+  traceMarketDataRequest,
+  traceSubscriptionEvent,
+  traceQuantumOperation,
+} from "./observability";
 import { z } from "zod";
 
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -822,6 +830,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error testing email service:", error);
       res.status(500).json({ success: false, message: "Failed to test email service" });
+    }
+  });
+
+  // Arize AI Observability Demo Routes
+  app.get('/api/observability/demo', async (req, res) => {
+    try {
+      const { observabilityDemo } = await import('./observabilityDemo');
+      const results = await observabilityDemo.runComprehensiveDemo();
+      
+      res.json({
+        success: true,
+        message: 'Observability demo completed - check Arize AI dashboard for trace data',
+        operations: [
+          'User authentication',
+          'Chat interactions', 
+          'Trade execution',
+          'Quantum optimization',
+          'Fraud detection',
+          'Market data requests',
+          'Backtest runs',
+          'Subscription events'
+        ],
+        traceCount: results.length,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error('Observability demo error:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: error.message || 'Demo failed' 
+      });
+    }
+  });
+
+  app.get('/api/observability/status', async (req, res) => {
+    try {
+      const hasArizeCredentials = !!(process.env.ARIZE_API_KEY && process.env.ARIZE_SPACE_ID);
+      
+      res.json({
+        observabilityEnabled: true,
+        platform: hasArizeCredentials ? 'Arize AI Cloud' : 'Local Phoenix',
+        endpoint: process.env.ARIZE_ENDPOINT_URL || 'http://localhost:6006/v1/traces',
+        hasCredentials: hasArizeCredentials,
+        serviceName: 'AlphaForge-Trading-Platform',
+        features: [
+          'Trade execution tracking',
+          'Quantum operation monitoring', 
+          'Fraud detection events',
+          'User interaction analytics',
+          'Market data performance',
+          'System health metrics'
+        ]
+      });
+    } catch (error: any) {
+      res.status(500).json({ 
+        success: false, 
+        message: error.message 
+      });
     }
   });
 
