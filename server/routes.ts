@@ -864,6 +864,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Generate comprehensive dataset for Arize AI demonstration
+  app.post('/api/observability/generate-data', async (req, res) => {
+    try {
+      const { arizeDataGenerator } = await import('./arizeDataGenerator');
+      const summary = await arizeDataGenerator.generateComprehensiveDataset();
+      
+      res.json({
+        success: true,
+        message: 'Comprehensive telemetry data generated successfully',
+        summary,
+        arizeInstructions: {
+          step1: 'Check your Arize AI dashboard for incoming traces',
+          step2: 'Filter by service: AlphaForge-Trading-Platform', 
+          step3: 'Explore trace patterns across different operation types',
+          step4: 'Set up alerts and dashboards for key metrics'
+        }
+      });
+    } catch (error: any) {
+      console.error('Data generation error:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: error.message || 'Data generation failed' 
+      });
+    }
+  });
+
+  // Start continuous data generation for ongoing demonstration
+  app.post('/api/observability/start-continuous', async (req, res) => {
+    try {
+      const { intervalMinutes = 30 } = req.body;
+      const { arizeDataGenerator } = await import('./arizeDataGenerator');
+      const result = await arizeDataGenerator.startContinuousGeneration(intervalMinutes);
+      
+      res.json({
+        success: true,
+        message: 'Continuous data generation started',
+        ...result,
+        note: 'This will generate realistic telemetry data every ' + intervalMinutes + ' minutes for Arize AI analysis'
+      });
+    } catch (error: any) {
+      console.error('Continuous generation error:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: error.message || 'Failed to start continuous generation' 
+      });
+    }
+  });
+
+  // Check data generation status
+  app.get('/api/observability/generation-status', async (req, res) => {
+    try {
+      const { arizeDataGenerator } = await import('./arizeDataGenerator');
+      const status = arizeDataGenerator.getGenerationStatus();
+      
+      res.json({
+        ...status,
+        arizeCredentials: !!(process.env.ARIZE_API_KEY && process.env.ARIZE_SPACE_ID),
+        endpoint: process.env.ARIZE_ENDPOINT_URL || 'http://localhost:6006/v1/traces'
+      });
+    } catch (error: any) {
+      res.status(500).json({ 
+        success: false, 
+        message: error.message 
+      });
+    }
+  });
+
   app.get('/api/observability/status', async (req, res) => {
     try {
       const hasArizeCredentials = !!(process.env.ARIZE_API_KEY && process.env.ARIZE_SPACE_ID);

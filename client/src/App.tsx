@@ -17,6 +17,7 @@ import Subscribe from "@/pages/subscribe";
 import Settings from "@/pages/settings";
 import QuantumOptimization from "@/pages/quantum-optimization";
 import QuantumAssistant from "@/pages/quantum-assistant";
+import ArizeDemo from "@/pages/arize-demo";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -25,6 +26,7 @@ function Router() {
     <Switch>
       {/* Public routes available to everyone */}
       <Route path="/quantum-assistant" component={QuantumAssistant} />
+      <Route path="/arize-demo" component={ArizeDemo} />
       
       {isLoading || !isAuthenticated ? (
         <Route path="/" component={Landing} />
