@@ -11,9 +11,10 @@ import { ActiveStrategies } from "@/components/dashboard/active-strategies";
 import { RecentActivity } from "@/components/dashboard/recent-activity";
 import { UpgradeModal } from "@/components/dashboard/upgrade-modal";
 import { ObservabilityStatus } from "@/components/dashboard/observability-status";
+import { FloatingAiButton } from "@/components/ui/floating-ai-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Download, Settings, History, FileDown, Activity, CheckCircle } from "lucide-react";
+import { Plus, Download, Settings, History, FileDown, Activity, CheckCircle, MessageSquare, Bot } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -115,6 +116,36 @@ export default function Dashboard() {
               </div>
             </div>
 
+            {/* AI Assistant Quick Access */}
+            <Card className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 border-blue-200 dark:border-blue-800">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                      <Bot className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                        AI Trading Assistant
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-300">
+                        Get intelligent insights, strategy recommendations, and quantum-powered analysis
+                      </p>
+                    </div>
+                  </div>
+                  <Link href="/quantum-assistant">
+                    <Button
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium px-6"
+                      data-testid="button-chat-ai"
+                    >
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      Chat Now
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Portfolio Overview Cards */}
             <PortfolioOverview
               portfolioValue={data.portfolioValue}
@@ -188,6 +219,9 @@ export default function Dashboard() {
             </Card>
           </div>
 
+          {/* Floating AI Assistant */}
+          <FloatingAiButton />
+          
           {/* Quick Actions Floating Panel */}
           <div className="fixed bottom-6 right-6 z-40">
             <Card className="p-4 shadow-lg">

@@ -14,6 +14,12 @@ import alphaForgeLogo from "@assets/AlphaForge_1755019929567.png";
 export default function Landing() {
   const features = [
     {
+      icon: Bot,
+      title: "AI Trading Assistant",
+      description: "Get intelligent strategy recommendations and quantum-powered portfolio optimization insights",
+      highlight: true
+    },
+    {
       icon: TrendingUp,
       title: "Advanced Backtesting",
       description: "Run realistic historical simulations with transaction costs, slippage, and market constraints"
@@ -22,11 +28,6 @@ export default function Landing() {
       icon: Shield,
       title: "Risk Management",
       description: "Multi-layered risk controls with real-time monitoring and configurable kill-switches"
-    },
-    {
-      icon: Bot,
-      title: "Strategy Builder",
-      description: "Create and deploy trading strategies with an intuitive no-code interface"
     },
     {
       icon: BarChart3,
@@ -97,7 +98,12 @@ export default function Landing() {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </a>
             </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8" asChild data-testid="button-try-assistant">
+            <Button 
+              size="lg" 
+              className="text-lg px-8 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0" 
+              asChild 
+              data-testid="button-try-assistant"
+            >
               <a href="/quantum-assistant">
                 Try AI Assistant
                 <Bot className="ml-2 h-5 w-5" />
@@ -120,10 +126,18 @@ export default function Landing() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="text-center hover:shadow-lg transition-shadow">
+              <Card key={index} className={`text-center hover:shadow-lg transition-shadow ${
+                feature.highlight ? "ring-2 ring-blue-500 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950" : ""
+              }`}>
                 <CardContent className="p-6">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <feature.icon className="h-6 w-6 text-primary" />
+                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4 ${
+                    feature.highlight 
+                      ? "bg-gradient-to-r from-blue-600 to-purple-600" 
+                      : "bg-primary/10"
+                  }`}>
+                    <feature.icon className={`h-6 w-6 ${
+                      feature.highlight ? "text-white" : "text-primary"
+                    }`} />
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                     {feature.title}
@@ -131,6 +145,14 @@ export default function Landing() {
                   <p className="text-gray-600 dark:text-gray-300">
                     {feature.description}
                   </p>
+                  {feature.highlight && (
+                    <Button 
+                      className="mt-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                      asChild
+                    >
+                      <a href="/quantum-assistant">Try Now</a>
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             ))}

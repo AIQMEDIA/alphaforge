@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Moon, Sun, ChevronDown } from "lucide-react";
+import { Moon, Sun, ChevronDown, Bot, MessageSquare } from "lucide-react";
 import { Link } from "wouter";
 
 export function Navbar() {
@@ -57,6 +57,19 @@ export function Navbar() {
             </div>
           </div>
           <div className="flex items-center space-x-4">
+            {/* AI Assistant Button */}
+            <Link href="/quantum-assistant">
+              <Button
+                variant="default"
+                size="sm"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium"
+                data-testid="button-ai-assistant"
+              >
+                <Bot className="h-4 w-4 mr-2" />
+                AI Assistant
+              </Button>
+            </Link>
+            
             <Button
               variant="ghost"
               size="icon"
