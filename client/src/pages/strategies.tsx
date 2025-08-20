@@ -34,6 +34,8 @@ export default function Strategies() {
     name: "",
     description: "",
     type: "",
+    symbols: [] as string[],
+    symbolInput: "",
     config: {},
   });
 
@@ -49,7 +51,7 @@ export default function Strategies() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/strategies"] });
       setNewStrategyOpen(false);
-      setNewStrategy({ name: "", description: "", type: "", config: {} });
+      setNewStrategy({ name: "", description: "", type: "", symbols: [], symbolInput: "", config: {} });
       toast({
         title: "Strategy Created",
         description: "Your new strategy has been created successfully.",
@@ -230,6 +232,65 @@ export default function Strategies() {
                         <SelectItem value="pairs">Pairs Trading</SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="symbols">Trading Symbols</Label>
+                    <div className="space-y-2">
+                      <div className="flex space-x-2">
+                        <Input
+                          id="symbols"
+                          value={newStrategy.symbolInput}
+                          onChange={(e) =>
+                            setNewStrategy({ ...newStrategy, symbolInput: e.target.value.toUpperCase() })
+                          }
+                          placeholder="Enter symbols (e.g., AAPL, MSFT)"
+                          data-testid="input-strategy-symbols"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => {
+                            if (newStrategy.symbolInput.trim()) {
+                              const symbols = newStrategy.symbolInput.split(',').map(s => s.trim().toUpperCase()).filter(s => s);
+                              const uniqueSymbols = Array.from(new Set([...newStrategy.symbols, ...symbols]));
+                              setNewStrategy({ 
+                                ...newStrategy, 
+                                symbols: uniqueSymbols,
+                                symbolInput: ""
+                              });
+                            }
+                          }}
+                          data-testid="button-add-symbols"
+                        >
+                          Add
+                        </Button>
+                      </div>
+                      {newStrategy.symbols.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {newStrategy.symbols.map((symbol, index) => (
+                            <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                              {symbol}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setNewStrategy({
+                                    ...newStrategy,
+                                    symbols: newStrategy.symbols.filter((_, i) => i !== index)
+                                  });
+                                }}
+                                className="ml-1 text-xs hover:text-red-600"
+                                data-testid={`button-remove-symbol-${symbol}`}
+                              >
+                                ×
+                              </button>
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                      <p className="text-xs text-gray-500">
+                        Popular: AAPL, MSFT, GOOGL, AMZN, TSLA, NVDA
+                      </p>
+                    </div>
                   </div>
                   <div className="flex space-x-2">
                     <Button

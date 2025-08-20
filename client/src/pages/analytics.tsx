@@ -31,6 +31,7 @@ export default function Analytics() {
   const { toast } = useToast();
   const [timeframe, setTimeframe] = useState("1M");
   const [analyticsType, setAnalyticsType] = useState("performance");
+  const [selectedSymbol, setSelectedSymbol] = useState("portfolio");
 
   const { data: performanceData, isLoading: performanceLoading, error } = useQuery({
     queryKey: ["/api/portfolio/performance", { days: 30 }],
@@ -155,10 +156,28 @@ export default function Analytics() {
                 Analytics & Reports
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
-                Comprehensive performance analysis and trading insights
+                {selectedSymbol === "portfolio" 
+                  ? "Comprehensive portfolio performance analysis and trading insights"
+                  : `Performance analysis for ${selectedSymbol} - ${timeframe} period`
+                }
               </p>
             </div>
             <div className="flex space-x-3">
+              <Select value={selectedSymbol} onValueChange={setSelectedSymbol}>
+                <SelectTrigger className="w-40" data-testid="select-symbol">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="portfolio">Portfolio</SelectItem>
+                  <SelectItem value="AAPL">AAPL</SelectItem>
+                  <SelectItem value="MSFT">MSFT</SelectItem>
+                  <SelectItem value="GOOGL">GOOGL</SelectItem>
+                  <SelectItem value="AMZN">AMZN</SelectItem>
+                  <SelectItem value="TSLA">TSLA</SelectItem>
+                  <SelectItem value="NVDA">NVDA</SelectItem>
+                </SelectContent>
+              </Select>
+              
               <Select value={timeframe} onValueChange={setTimeframe}>
                 <SelectTrigger className="w-32" data-testid="select-timeframe">
                   <SelectValue />

@@ -23,6 +23,8 @@ export default function Backtesting() {
   const { toast } = useToast();
   const [backtest, setBacktest] = useState({
     strategyId: "",
+    symbols: [] as string[],
+    symbolInput: "",
     startDate: "",
     endDate: "",
     initialCapital: 100000,
@@ -59,10 +61,10 @@ export default function Backtesting() {
   });
 
   const handleRunBacktest = () => {
-    if (!backtest.strategyId || !backtest.startDate || !backtest.endDate) {
+    if (!backtest.strategyId || !backtest.startDate || !backtest.endDate || backtest.symbols.length === 0) {
       toast({
         title: "Missing Information",
-        description: "Please fill in all required fields",
+        description: "Please fill in all required fields including at least one symbol",
         variant: "destructive",
       });
       return;
@@ -184,6 +186,62 @@ export default function Backtesting() {
                     onChange={(e) => setBacktest({ ...backtest, endDate: e.target.value })}
                     data-testid="input-end-date"
                   />
+                </div>
+
+                <div>
+                  <Label htmlFor="symbols">Test Symbols</Label>
+                  <div className="space-y-2">
+                    <div className="flex space-x-2">
+                      <Input
+                        id="symbols"
+                        value={backtest.symbolInput}
+                        onChange={(e) =>
+                          setBacktest({ ...backtest, symbolInput: e.target.value.toUpperCase() })
+                        }
+                        placeholder="e.g., AAPL, MSFT"
+                        data-testid="input-backtest-symbols"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          if (backtest.symbolInput.trim()) {
+                            const symbols = backtest.symbolInput.split(',').map(s => s.trim().toUpperCase()).filter(s => s);
+                            const uniqueSymbols = Array.from(new Set([...backtest.symbols, ...symbols]));
+                            setBacktest({ 
+                              ...backtest, 
+                              symbols: uniqueSymbols,
+                              symbolInput: ""
+                            });
+                          }
+                        }}
+                        data-testid="button-add-backtest-symbols"
+                      >
+                        Add
+                      </Button>
+                    </div>
+                    {backtest.symbols.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {backtest.symbols.map((symbol, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {symbol}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setBacktest({
+                                  ...backtest,
+                                  symbols: backtest.symbols.filter((_, i) => i !== index)
+                                });
+                              }}
+                              className="ml-1 hover:text-red-600"
+                            >
+                              ×
+                            </button>
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div>
