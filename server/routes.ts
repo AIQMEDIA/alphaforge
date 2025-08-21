@@ -1,3 +1,12 @@
+/*
+ * AlphaForge - API Routes & Authentication
+ * Copyright (c) 2025 AlphaForge. All rights reserved.
+ * 
+ * PROPRIETARY AND CONFIDENTIAL
+ * Contains proprietary trading algorithms and business logic.
+ * Unauthorized access, copying, or distribution is strictly prohibited.
+ */
+
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import path from "path";

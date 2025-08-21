@@ -1,3 +1,13 @@
+/*
+ * AlphaForge - Quantum Trading Platform
+ * Copyright (c) 2025 AlphaForge. All rights reserved.
+ * 
+ * This software is proprietary and confidential. Unauthorized copying, 
+ * distribution, or use is strictly prohibited.
+ * 
+ * World's First Retail Quantum Trading Platform
+ */
+
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";

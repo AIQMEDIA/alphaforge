@@ -1,3 +1,14 @@
+/*
+ * AlphaForge - Quantum Trading Platform
+ * Copyright (c) 2025 AlphaForge. All rights reserved.
+ * 
+ * This software is proprietary and confidential. Unauthorized copying, 
+ * distribution, or use is strictly prohibited.
+ * 
+ * World's First Retail Quantum Trading Platform
+ * Quantum Computing Integration: IBM Quantum, Google Cirq, Amazon Braket
+ */
+
 import express, { type Request, Response, NextFunction } from "express";
 import path from "path";
 import { registerRoutes } from "./routes";

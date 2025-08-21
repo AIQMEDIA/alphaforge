@@ -1,3 +1,15 @@
+/*
+ * AlphaForge - Quantum Portfolio Optimization Engine
+ * Copyright (c) 2025 AlphaForge. All rights reserved.
+ * 
+ * PROPRIETARY AND CONFIDENTIAL
+ * Contains trade secrets and proprietary quantum algorithms.
+ * Unauthorized access, copying, or distribution is strictly prohibited.
+ * 
+ * Quantum Providers: IBM Quantum, Google Cirq, Amazon Braket
+ * Algorithms: VQE, QAOA, Quantum Machine Learning
+ */
+
 import { spawn } from 'child_process';
 import path from 'path';
 import fs from 'fs/promises';

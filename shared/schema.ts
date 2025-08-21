@@ -1,3 +1,12 @@
+/*
+ * AlphaForge - Database Schema & Types
+ * Copyright (c) 2025 AlphaForge. All rights reserved.
+ * 
+ * PROPRIETARY AND CONFIDENTIAL
+ * Contains proprietary database schema and data structures.
+ * Unauthorized access, copying, or distribution is strictly prohibited.
+ */
+
 import { sql } from 'drizzle-orm';
 import { relations } from 'drizzle-orm';
 import {
