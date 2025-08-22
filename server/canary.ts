@@ -57,6 +57,46 @@ export function canaryAccessed(context: string, metadata?: any) {
   }, Math.random() * 2000 + 1000); // Random delay 1-3 seconds
 }
 
+// Enhanced competitor and testing activity detection
+function detectSuspiciousActivity(userAgent: string, referer: string, ip: string): string[] {
+  const indicators: string[] = [];
+  
+  // Check for known competitors and testing organizations
+  const suspiciousKeywords = [
+    'albion', 'trillium', 'trade desk', 'trading desk',
+    'quantconnect', 'quantopian', 'zipline', 'lean',
+    'interactive brokers', 'alpaca', 'robinhood',
+    'scrapy', 'selenium', 'playwright', 'puppeteer',
+    'bot', 'crawler', 'spider', 'automated',
+    'test', 'qa', 'quality assurance', 'penetration'
+  ];
+  
+  const userAgentLower = userAgent.toLowerCase();
+  const refererLower = referer.toLowerCase();
+  
+  // Check user agent
+  suspiciousKeywords.forEach(keyword => {
+    if (userAgentLower.includes(keyword)) {
+      indicators.push(`suspicious_user_agent:${keyword}`);
+    }
+    if (refererLower.includes(keyword)) {
+      indicators.push(`suspicious_referer:${keyword}`);
+    }
+  });
+  
+  // Check for automated testing patterns
+  if (userAgentLower.includes('headless') || userAgentLower.includes('automation')) {
+    indicators.push('automated_testing_detected');
+  }
+  
+  // Check for known competitor IP ranges (placeholder - would need real data)
+  if (ip.startsWith('192.168.') || ip.startsWith('10.')) {
+    indicators.push('internal_network_testing');
+  }
+  
+  return indicators;
+}
+
 export function sendSecurityAlert(alert: SecurityAlert) {
   // Log security alert
   console.error('🔒 SECURITY ALERT:', {
@@ -88,8 +128,37 @@ export function apiCanaryTriggered(req: any) {
     sessionId: req.sessionID,
     path: req.path,
     method: req.method,
+    referer: req.get('Referer') || 'unknown',
     timestamp: new Date().toISOString()
   };
+
+  // Check for suspicious activity indicators
+  const suspiciousIndicators = detectSuspiciousActivity(
+    metadata.userAgent, 
+    metadata.referer, 
+    metadata.ip
+  );
+
+  // Enhanced logging for competitor detection
+  if (suspiciousIndicators.length > 0) {
+    console.error(`🚨🎯 CRITICAL SECURITY ALERT: Potential competitor/tester detected`, {
+      ...metadata,
+      suspiciousIndicators,
+      severity: 'critical',
+      alertType: 'competitor_detection',
+      immediateResponse: 'required'
+    });
+    
+    // Special trace for competitor activity
+    traceSecurityEvent('competitor_probe_detected', `HIGH-PRIORITY: ${req.path} accessed by suspicious entity`, {
+      ...metadata,
+      suspiciousIndicators,
+      severity: 'critical',
+      attack_vector: 'competitor_reconnaissance',
+      endpoint_type: 'protected_canary',
+      threat_level: 'immediate_attention_required'
+    });
+  }
 
   canaryAccessed('hidden_api_endpoint', metadata);
   
