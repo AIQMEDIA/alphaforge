@@ -64,11 +64,14 @@ function detectSuspiciousActivity(userAgent: string, referer: string, ip: string
   // Check for known competitors and testing organizations
   const suspiciousKeywords = [
     'albion', 'trillium', 'trade desk', 'trading desk',
+    'hedge fund', 'hedgefund', 'prop trading', 'proprietary',
     'quantconnect', 'quantopian', 'zipline', 'lean',
     'interactive brokers', 'alpaca', 'robinhood',
+    'citadel', 'renaissance', 'two sigma', 'de shaw',
     'scrapy', 'selenium', 'playwright', 'puppeteer',
     'bot', 'crawler', 'spider', 'automated',
-    'test', 'qa', 'quality assurance', 'penetration'
+    'test', 'qa', 'quality assurance', 'penetration',
+    'institutional', 'tradingbot', 'algo trading'
   ];
   
   const userAgentLower = userAgent.toLowerCase();
@@ -141,13 +144,30 @@ export function apiCanaryTriggered(req: any) {
 
   // Enhanced logging for competitor detection
   if (suspiciousIndicators.length > 0) {
-    console.error(`🚨🎯 CRITICAL SECURITY ALERT: Potential competitor/tester detected`, {
-      ...metadata,
-      suspiciousIndicators,
-      severity: 'critical',
-      alertType: 'competitor_detection',
-      immediateResponse: 'required'
-    });
+    // Special handling for hedge fund detection
+    const isHedgeFund = suspiciousIndicators.some(indicator => 
+      indicator.includes('hedge') || indicator.includes('institutional') || 
+      indicator.includes('tradingbot') || indicator.includes('proprietary')
+    );
+    
+    if (isHedgeFund) {
+      console.error(`🎯💰 HEDGE FUND INTELLIGENCE ALERT: Institutional entity detected`, {
+        ...metadata,
+        suspiciousIndicators,
+        severity: 'high_value_target',
+        alertType: 'hedge_fund_detection',
+        businessOpportunity: 'institutional_prospect',
+        recommendedAction: 'intelligence_gathering_and_business_development'
+      });
+    } else {
+      console.error(`🚨🎯 CRITICAL SECURITY ALERT: Potential competitor/tester detected`, {
+        ...metadata,
+        suspiciousIndicators,
+        severity: 'critical',
+        alertType: 'competitor_detection',
+        immediateResponse: 'required'
+      });
+    }
     
     // Special trace for competitor activity
     traceSecurityEvent('competitor_probe_detected', `HIGH-PRIORITY: ${req.path} accessed by suspicious entity`, {
