@@ -11,6 +11,7 @@ import { traceSecurityEvent, traceTradingIntelligence } from "./observability";
 import { enhancedLogger } from "./alerting/logger";
 import { freeNotificationSystem } from "./alerting/notifier";
 import { businessIntelligenceRouter } from "./alerting/businessIntelligence";
+import { advancedWebhookServices } from "./alerting/webhookServices";
 
 interface ThreatEvent {
   sessionId: string;
@@ -243,16 +244,38 @@ export class ThreatResponsePlaybook {
         detectedFeatures: event.detectedFeatures
       });
       
-      // Send business prospect alert
+      // Send business prospect alert through multiple channels
       if (event.traderType === 'hedge_fund') {
-        await freeNotificationSystem.sendHedgeFundAlert({
-          traderType: event.traderType,
-          riskScore: event.riskScore,
-          businessValue: event.businessValueScore,
-          sessionId: event.sessionId,
-          indicators: event.suspiciousIndicators,
-          estimatedRevenue: biRoute.estimatedValue
-        });
+        // Critical hedge fund alerts go to all channels
+        await Promise.all([
+          freeNotificationSystem.sendHedgeFundAlert({
+            traderType: event.traderType,
+            riskScore: event.riskScore,
+            businessValue: event.businessValueScore,
+            sessionId: event.sessionId,
+            indicators: event.suspiciousIndicators,
+            estimatedRevenue: biRoute.estimatedValue
+          }),
+          advancedWebhookServices.sendHedgeFundCriticalAlert({
+            traderType: event.traderType,
+            riskScore: event.riskScore,
+            businessValue: event.businessValueScore,
+            sessionId: event.sessionId,
+            indicators: event.suspiciousIndicators,
+            estimatedRevenue: biRoute.estimatedValue
+          })
+        ]);
+        
+        // Executive escalation for high-value hedge funds
+        if (biRoute.estimatedValue > 400000) {
+          await advancedWebhookServices.sendExecutiveEscalation({
+            prospectType: event.traderType,
+            estimatedRevenue: biRoute.estimatedValue,
+            businessValue: event.businessValueScore,
+            sessionId: event.sessionId,
+            priority: biRoute.priority
+          });
+        }
       } else {
         await freeNotificationSystem.sendBusinessProspectAlert({
           prospectType: event.traderType,

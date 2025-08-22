@@ -7,7 +7,7 @@
  * Unauthorized access, copying, or distribution is strictly prohibited.
  */
 
-import { Database } from 'sqlite3';
+import sqlite3 from 'sqlite3';
 import { promises as fs } from 'fs';
 import path from 'path';
 
@@ -23,7 +23,7 @@ interface LogEvent {
 }
 
 export class EnhancedLogger {
-  private db!: Database;
+  private db!: sqlite3.Database;
   private logDir: string;
   
   constructor() {
@@ -41,7 +41,7 @@ export class EnhancedLogger {
   }
   
   private initializeDatabase(): void {
-    this.db = new Database(path.join(process.cwd(), 'activity_log.db'));
+    this.db = new sqlite3.Database(path.join(process.cwd(), 'activity_log.db'));
     
     this.db.run(`
       CREATE TABLE IF NOT EXISTS events (

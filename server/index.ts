@@ -18,6 +18,9 @@ import { initializeObservability } from "./observability";
 // Initialize observability system
 initializeObservability();
 
+// Initialize automated reporting scheduler
+import './reporting/scheduler';
+
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
