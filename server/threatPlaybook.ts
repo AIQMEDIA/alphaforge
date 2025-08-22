@@ -8,6 +8,9 @@
  */
 
 import { traceSecurityEvent, traceTradingIntelligence } from "./observability";
+import { enhancedLogger } from "./alerting/logger";
+import { freeNotificationSystem } from "./alerting/notifier";
+import { businessIntelligenceRouter } from "./alerting/businessIntelligence";
 
 interface ThreatEvent {
   sessionId: string;
@@ -151,15 +154,25 @@ export class ThreatResponsePlaybook {
       fullTrace: event.fullTrace
     };
     
-    // Save to secure audit system (extend for production database)
+    // Enhanced logging with free alerting system
+    await enhancedLogger.logThreatIntelligence({
+      threatType: event.traderType,
+      traderClassification: event.traderType,
+      riskScore: event.riskScore,
+      businessValue: event.businessValueScore,
+      indicators: event.suspiciousIndicators,
+      ipAddress: event.ipAddress,
+      userAgent: event.userAgent,
+      sessionId: event.sessionId,
+      automatedActions: this.getAutomaticActions(event),
+      manualReviewRequired: event.riskScore > 150
+    });
+    
     console.log(`📸 FORENSIC SNAPSHOT: Complete activity profile captured`, {
       sessionId: event.sessionId,
       dataPoints: Object.keys(forensicSnapshot).length,
       timestamp: forensicSnapshot.timestamp
     });
-    
-    // Optional: Save to database for long-term analysis
-    // await this.saveForensicSnapshot(forensicSnapshot);
   }
   
   // Phase 3: Enhanced Arize AI Notification
@@ -218,15 +231,44 @@ export class ThreatResponsePlaybook {
       
       this.businessProspects.set(event.sessionId, biRoute);
       
+      // Enhanced business intelligence routing with free systems
+      await businessIntelligenceRouter.routeProspect({
+        sessionId: event.sessionId,
+        traderType: event.traderType,
+        businessValueScore: event.businessValueScore,
+        riskScore: event.riskScore,
+        indicators: event.suspiciousIndicators,
+        ipAddress: event.ipAddress,
+        userAgent: event.userAgent,
+        detectedFeatures: event.detectedFeatures
+      });
+      
+      // Send business prospect alert
+      if (event.traderType === 'hedge_fund') {
+        await freeNotificationSystem.sendHedgeFundAlert({
+          traderType: event.traderType,
+          riskScore: event.riskScore,
+          businessValue: event.businessValueScore,
+          sessionId: event.sessionId,
+          indicators: event.suspiciousIndicators,
+          estimatedRevenue: biRoute.estimatedValue
+        });
+      } else {
+        await freeNotificationSystem.sendBusinessProspectAlert({
+          prospectType: event.traderType,
+          businessValue: event.businessValueScore,
+          estimatedRevenue: biRoute.estimatedValue,
+          sessionId: event.sessionId,
+          contactRoute: biRoute.contactRoute
+        });
+      }
+      
       console.log(`💼 BUSINESS INTELLIGENCE: High-value prospect routed`, {
         prospectType: biRoute.prospectType,
         estimatedValue: biRoute.estimatedValue,
         priority: biRoute.priority,
         recommendedAction: biRoute.recommendedAction
       });
-      
-      // Automated CRM integration (extend for production)
-      await this.integrateCRM(event, biRoute);
     }
   }
   
