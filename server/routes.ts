@@ -1004,6 +1004,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log('🚀 Starting AlphaForge performance monitoring...');
   weeklyScheduler.startWeeklyReports();
 
+  // Webhook routes for WhatsApp and other services
+  const { webhookRoutes } = await import('./routes/webhook');
+  app.use('/api/webhooks', webhookRoutes);
+
   const httpServer = createServer(app);
   return httpServer;
 }
