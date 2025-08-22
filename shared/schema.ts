@@ -86,6 +86,41 @@ export const crmLeads = pgTable("crm_leads", {
   phone: varchar("phone"),
   leadSource: varchar("lead_source").default("chatbot"),
   status: varchar("status").default("new"), // new, contacted, qualified, converted
+  
+  // Enhanced trade desk detection fields
+  companyType: varchar("company_type"), // prop_trading, hedge_fund, family_office, retail_broker, trade_desk, market_maker
+  businessModel: varchar("business_model"), // b2b, b2c, institutional, retail
+  tradingVolume: varchar("trading_volume"), // <1M, 1M-10M, 10M-100M, 100M+
+  primaryAssets: varchar("primary_assets"), // equities, options, futures, forex, crypto, fixed_income
+  
+  // Behavioral analytics for IP protection
+  pageViews: integer("page_views").default(0),
+  timeOnSite: integer("time_on_site").default(0), // seconds
+  featuresViewed: jsonb("features_viewed").default('[]'), // array of feature names
+  downloadedContent: jsonb("downloaded_content").default('[]'), // whitepapers, demos, etc
+  
+  // Technical fingerprinting for competitor detection
+  browserFingerprint: varchar("browser_fingerprint"),
+  deviceType: varchar("device_type"), // desktop, mobile, tablet
+  operatingSystem: varchar("operating_system"),
+  screenResolution: varchar("screen_resolution"),
+  timezone: varchar("timezone"),
+  language: varchar("language"),
+  
+  // Competitive intelligence tracking
+  referrerDomain: varchar("referrer_domain"),
+  utmSource: varchar("utm_source"),
+  utmMedium: varchar("utm_medium"),
+  utmCampaign: varchar("utm_campaign"),
+  searchKeywords: varchar("search_keywords"),
+  
+  // Risk assessment for bad actors
+  competitorRiskScore: integer("competitor_risk_score").default(0), // 0-100
+  ipInfringementFlags: jsonb("ip_infringement_flags").default('[]'), // array of suspicious indicators
+  badActorScore: integer("bad_actor_score").default(0), // 0-100
+  tradeDesktDetected: boolean("trade_desk_detected").default(false),
+  suspiciousPatterns: jsonb("suspicious_patterns").default('[]'), // behavioral red flags
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
