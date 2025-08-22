@@ -541,7 +541,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         sender: 'bot',
         timestamp: conv.createdAt,
         messageType: conv.messageType,
-      }))).sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+      }))).sort((a, b) => new Date(a.timestamp || 0).getTime() - new Date(b.timestamp || 0).getTime());
       
       res.json(messages);
     } catch (error) {
