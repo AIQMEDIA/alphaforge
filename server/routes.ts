@@ -19,6 +19,7 @@ import { brokerService, BROKERS } from "./brokerApi";
 import { quantumOptimizer, QuantumProvider, QuantumAlgorithm } from "./quantumOptimizer";
 import { quantumAssistant } from "./quantumAssistant";
 import { fraudPreventionService } from "./fraudPrevention";
+import { securityCanaries } from "./canary";
 import { weeklyScheduler } from './weeklyScheduler.js';
 import { emailService } from './emailService.js';
 import { insertStrategySchema, insertTransactionSchema, insertBacktestResultSchema, insertCrmLeadSchema } from "@shared/schema";
@@ -965,6 +966,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: error.message 
       });
     }
+  });
+
+  // Security canary endpoints - these should never be accessed by legitimate users
+  // If accessed, someone is likely probing the system
+  app.get('/api/admin', (req, res) => {
+    const response = securityCanaries.apiAccess(req);
+    res.status(503).json(response);
+  });
+
+  app.get('/api/config', (req, res) => {
+    const response = securityCanaries.apiAccess(req);
+    res.status(503).json(response);
+  });
+
+  app.get('/api/debug', (req, res) => {
+    const response = securityCanaries.apiAccess(req);
+    res.status(503).json(response);
+  });
+
+  app.get('/api/internal', (req, res) => {
+    const response = securityCanaries.apiAccess(req);
+    res.status(503).json(response);
+  });
+
+  app.get('/api/.env', (req, res) => {
+    const response = securityCanaries.apiAccess(req);
+    res.status(503).json(response);
+  });
+
+  app.get('/api/quantum/internal', (req, res) => {
+    const response = securityCanaries.apiAccess(req);
+    res.status(503).json(response);
   });
 
   // Start the weekly performance monitoring scheduler
