@@ -1,29 +1,63 @@
 // AlphaForge Email Service
 // Handles weekly performance report emails and notifications
 
-import { MailService } from '@sendgrid/mail';
+import * as nodemailer from 'nodemailer';
 import { performanceMonitor, PerformanceMetrics } from './performanceMonitoring.js';
 
 export class EmailService {
-  private mailService: MailService;
-  private fromEmail: string = 'reports@alphaforge.app';
+  private transporter: nodemailer.Transporter | null = null;
+  private fromEmail: string;
   private isConfigured: boolean = false;
 
   constructor() {
-    this.mailService = new MailService();
+    this.fromEmail = process.env.EMAIL_FROM || 'reports@alphaforge.app';
     this.configure();
   }
 
   private configure() {
-    const apiKey = process.env.SENDGRID_API_KEY;
+    // Check for SMTP configuration first
+    const smtpHost = process.env.SMTP_HOST;
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPass = process.env.SMTP_PASS;
+    const smtpPort = process.env.SMTP_PORT;
     
-    if (apiKey) {
-      this.mailService.setApiKey(apiKey);
+    if (smtpHost && smtpUser && smtpPass) {
+      // Use SMTP configuration
+      this.transporter = nodemailer.createTransport({
+        host: smtpHost,
+        port: parseInt(smtpPort || '587'),
+        secure: false, // true for 465, false for other ports
+        auth: {
+          user: smtpUser,
+          pass: smtpPass
+        }
+      });
       this.isConfigured = true;
-      console.log('✅ SendGrid email service configured');
+      console.log('✅ SMTP email service configured');
     } else {
-      console.log('⚠️  SendGrid API key not found - email reports will be logged only');
-      this.isConfigured = false;
+      // Fallback to SendGrid if SMTP not available
+      const apiKey = process.env.SENDGRID_API_KEY;
+      if (apiKey) {
+        const { MailService } = require('@sendgrid/mail');
+        const mailService = new MailService();
+        mailService.setApiKey(apiKey);
+        // Create a wrapper for SendGrid to match nodemailer interface
+        this.transporter = {
+          sendMail: async (mailOptions: any) => {
+            await mailService.send({
+              to: mailOptions.to,
+              from: mailOptions.from,
+              subject: mailOptions.subject,
+              html: mailOptions.html
+            });
+          }
+        } as any;
+        this.isConfigured = true;
+        console.log('✅ SendGrid email service configured');
+      } else {
+        console.log('⚠️  No email service configured - reports will be logged only');
+        this.isConfigured = false;
+      }
     }
   }
 
@@ -33,9 +67,9 @@ export class EmailService {
       const metrics = await performanceMonitor.generateWeeklyReport();
       const htmlContent = performanceMonitor.generateEmailReport(metrics);
       
-      if (this.isConfigured) {
-        // Send via SendGrid
-        await this.mailService.send({
+      if (this.isConfigured && this.transporter) {
+        // Send via configured transport (SMTP or SendGrid)
+        await this.transporter.sendMail({
           to: recipientEmail,
           from: this.fromEmail,
           subject: `AlphaForge Weekly Performance Report - ${metrics.weekStart.toLocaleDateString()}`,
@@ -70,7 +104,7 @@ export class EmailService {
         }
         
         console.log('\n📄 Full HTML report saved to console');
-        console.log('To enable email delivery, add your SENDGRID_API_KEY to environment variables');
+        console.log('To enable email delivery, add SMTP credentials or SENDGRID_API_KEY to environment variables');
         
         return true;
       }
@@ -82,12 +116,12 @@ export class EmailService {
 
   async sendTestEmail(recipientEmail: string): Promise<boolean> {
     try {
-      if (!this.isConfigured) {
+      if (!this.isConfigured || !this.transporter) {
         console.log(`⚠️  Email service not configured - test email would be sent to ${recipientEmail}`);
         return false;
       }
 
-      await this.mailService.send({
+      await this.transporter.sendMail({
         to: recipientEmail,
         from: this.fromEmail,
         subject: 'AlphaForge Email Service Test',
@@ -121,7 +155,7 @@ export class EmailService {
       return {
         isConfigured: false,
         message: 'Email service is not configured - reports will be logged only',
-        instructions: 'Add SENDGRID_API_KEY to your environment variables to enable email delivery'
+        instructions: 'Add SMTP credentials (SMTP_HOST, SMTP_USER, SMTP_PASS) or SENDGRID_API_KEY to your environment variables to enable email delivery'
       };
     }
   }
