@@ -9,6 +9,7 @@
 
 import { fraudPreventionService } from "./fraudPrevention";
 import { traceUserAction, traceSecurityEvent } from "./observability";
+import { threatResponsePlaybook } from "./threatPlaybook";
 
 interface SecurityAlert {
   type: string;
@@ -159,6 +160,22 @@ export function apiCanaryTriggered(req: any) {
         businessOpportunity: 'institutional_prospect',
         recommendedAction: 'intelligence_gathering_and_business_development'
       });
+      
+      // Trigger automated threat response playbook for hedge fund detection
+      threatResponsePlaybook.processSuspiciousTradingBot({
+        sessionId: metadata.sessionId || 'unknown',
+        userId: (metadata as any).userId,
+        riskScore: 175, // High risk for hedge fund bots
+        traderType: 'hedge_fund',
+        businessValueScore: 160, // High business value for institutional prospects
+        ipAddress: metadata.ip || 'unknown',
+        userAgent: metadata.userAgent || 'unknown',
+        suspiciousIndicators,
+        detectedFeatures: ['quantum_algorithms', 'institutional_trading', 'competitive_analysis'],
+        fullTrace: metadata,
+        timestamp: new Date()
+      }).catch(err => console.error('Threat playbook execution failed:', err));
+      
     } else {
       console.error(`🚨🎯 CRITICAL SECURITY ALERT: Potential competitor/tester detected`, {
         ...metadata,
@@ -167,6 +184,21 @@ export function apiCanaryTriggered(req: any) {
         alertType: 'competitor_detection',
         immediateResponse: 'required'
       });
+      
+      // Trigger automated threat response for general competitor detection
+      threatResponsePlaybook.processSuspiciousTradingBot({
+        sessionId: metadata.sessionId || 'unknown',
+        userId: (metadata as any).userId,
+        riskScore: 140, // High risk for competitors
+        traderType: 'institutional',
+        businessValueScore: 85, // Medium business value for general competitors
+        ipAddress: metadata.ip || 'unknown',
+        userAgent: metadata.userAgent || 'unknown',
+        suspiciousIndicators,
+        detectedFeatures: ['api_probing', 'system_analysis', 'competitive_research'],
+        fullTrace: metadata,
+        timestamp: new Date()
+      }).catch(err => console.error('Threat playbook execution failed:', err));
     }
     
     // Special trace for competitor activity
