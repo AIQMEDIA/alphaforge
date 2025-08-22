@@ -8,7 +8,7 @@
  */
 
 import { fraudPreventionService } from "./fraudPrevention";
-import { traceUserAction } from "./observability";
+import { traceUserAction, traceSecurityEvent } from "./observability";
 
 interface SecurityAlert {
   type: string;
@@ -41,13 +41,15 @@ export function canaryAccessed(context: string, metadata?: any) {
     console.warn(`🚨 Security canary triggered from IP: ${metadata.ip}`);
   }
   
-  // Log to observability system
-  traceUserAction('security_canary_triggered', {
-    context,
+  // Log to Arize Phoenix observability system
+  traceSecurityEvent('canary_accessed', context, {
     severity: 'high',
     ip: metadata?.ip,
-    userAgent: metadata?.userAgent
-  }, 'security');
+    userAgent: metadata?.userAgent,
+    sessionId: metadata?.sessionId,
+    timestamp: new Date().toISOString(),
+    alert_priority: 'immediate_investigation'
+  });
   
   // Optionally: slow down response, fuzz data, or escalate security measures
   setTimeout(() => {
@@ -80,12 +82,23 @@ export function sendSecurityAlert(alert: SecurityAlert) {
 
 // Hidden API endpoint canary - if accessed, someone is probing
 export function apiCanaryTriggered(req: any) {
-  canaryAccessed('hidden_api_endpoint', {
+  const metadata = {
     ip: req.ip,
     userAgent: req.get('User-Agent'),
     sessionId: req.sessionID,
     path: req.path,
-    method: req.method
+    method: req.method,
+    timestamp: new Date().toISOString()
+  };
+
+  canaryAccessed('hidden_api_endpoint', metadata);
+  
+  // Send specific security event to Arize for API probing detection
+  traceSecurityEvent('api_probe_detected', `Unauthorized access to ${req.path}`, {
+    ...metadata,
+    severity: 'high',
+    attack_vector: 'api_enumeration',
+    endpoint_type: 'protected_canary'
   });
   
   // Return fake data to confuse attackers

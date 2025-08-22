@@ -59,7 +59,70 @@ export async function traceOperation(
 
 // Specialized tracing functions for different AlphaForge operations
 
-export async function traceUserAction(
+export function traceUserAction(
+  action: string,
+  metadata: Attributes = {},
+  category: string = 'user'
+) {
+  if (!isInitialized) {
+    console.log(`[${category.toUpperCase()}] ${action}:`, metadata);
+    return;
+  }
+
+  const tracer = trace.getTracer('AlphaForge-Tracer');
+  tracer.startActiveSpan(`UserAction.${action}`, {
+    attributes: {
+      action,
+      category,
+      timestamp: Date.now(),
+      ...metadata,
+    }
+  }, (span) => {
+    span.setStatus({ code: SpanStatusCode.OK });
+    span.end();
+  });
+}
+
+export function traceSecurityEvent(
+  eventType: string,
+  context: string,
+  metadata: Attributes = {}
+) {
+  if (!isInitialized) {
+    console.warn(`[SECURITY] ${eventType}: ${context}`, metadata);
+    return;
+  }
+
+  const tracer = trace.getTracer('AlphaForge-Security-Tracer');
+  tracer.startActiveSpan(`SecurityEvent.${eventType}`, {
+    attributes: {
+      'security.event_type': eventType,
+      'security.context': context,
+      'security.severity': metadata.severity || 'medium',
+      'security.ip': metadata.ip || 'unknown',
+      'security.user_agent': metadata.userAgent || 'unknown',
+      'security.session_id': metadata.sessionId || 'unknown',
+      'arize.model_id': 'security-canary-system',
+      'arize.model_version': '1.0.0',
+      timestamp: Date.now(),
+      ...metadata,
+    }
+  }, (span) => {
+    // Mark as high priority for Arize anomaly detection
+    span.setStatus({ code: SpanStatusCode.OK });
+    span.setAttribute('security.alert_level', 'canary_triggered');
+    span.end();
+  });
+
+  // Also log to console for immediate visibility
+  console.warn(`🚨 SECURITY CANARY: ${eventType} - ${context}`, {
+    ip: metadata.ip,
+    severity: metadata.severity,
+    timestamp: new Date().toISOString()
+  });
+}
+
+export async function traceUserActionWithHandler(
   action: string,
   userId: string,
   handler: () => Promise<any>,
