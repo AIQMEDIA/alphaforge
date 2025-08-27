@@ -28,6 +28,7 @@ import Settings from "@/pages/settings";
 import QuantumOptimization from "@/pages/quantum-optimization";
 import QuantumAssistant from "@/pages/quantum-assistant";
 import ArizeDemo from "@/pages/arize-demo";
+import BrokerSetup from "@/pages/broker-setup";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -51,6 +52,7 @@ function Router() {
           <Route path="/subscribe" component={Subscribe} />
           <Route path="/settings" component={Settings} />
           <Route path="/quantum" component={QuantumOptimization} />
+          <Route path="/broker-setup" component={BrokerSetup} />
         </>
       )}
       <Route component={NotFound} />

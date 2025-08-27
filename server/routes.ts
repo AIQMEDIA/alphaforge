@@ -1004,6 +1004,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log('🚀 Starting AlphaForge performance monitoring...');
   weeklyScheduler.startWeeklyReports();
 
+  // Broker status endpoint for UI guidance
+  app.get('/api/broker/status', async (req, res) => {
+    try {
+      const hasApiKey = !!process.env.ALPACA_API_KEY;
+      const hasSecretKey = !!process.env.ALPACA_SECRET_KEY;
+      const connected = hasApiKey && hasSecretKey;
+      
+      res.json({
+        connected,
+        hasApiKey,
+        hasSecretKey,
+        broker: 'alpaca',
+        paperTrading: process.env.ALPACA_PAPER_TRADING === 'true'
+      });
+    } catch (error) {
+      console.error("Error checking broker status:", error);
+      res.status(500).json({ connected: false, error: "Failed to check broker status" });
+    }
+  });
+
   // Webhook routes for WhatsApp and other services
   const { webhookRoutes } = await import('./routes/webhook');
   app.use('/api/webhooks', webhookRoutes);

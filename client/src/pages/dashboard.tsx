@@ -12,6 +12,7 @@ import { RecentActivity } from "@/components/dashboard/recent-activity";
 import { UpgradeModal } from "@/components/dashboard/upgrade-modal";
 import { ObservabilityStatus } from "@/components/dashboard/observability-status";
 import { FloatingAiButton } from "@/components/ui/floating-ai-button";
+import BrokerSetupGuide from "@/components/BrokerSetupGuide";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Download, Settings, History, FileDown, Activity, CheckCircle, MessageSquare, Bot } from "lucide-react";
@@ -115,6 +116,9 @@ export default function Dashboard() {
                 </Button>
               </div>
             </div>
+
+            {/* Broker Setup Guide */}
+            <BrokerSetupGuide />
 
             {/* AI Assistant Quick Access */}
             <Card className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 border-blue-200 dark:border-blue-800">
