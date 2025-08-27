@@ -2,195 +2,75 @@
 
 ## Overview
 
-AlphaForge is a comprehensive web application for quantitative trading that addresses common shortcomings in existing trading platforms through reliability, transparency, and robust risk management. The platform provides advanced backtesting capabilities, real-time portfolio monitoring, strategy development tools, and multi-layered risk controls.
-
-The application is designed as a full-stack TypeScript solution with a React frontend and Express backend, targeting both novice and professional traders who need institutional-grade trading tools with an intuitive interface.
+AlphaForge is a comprehensive web application for quantitative trading designed to provide reliability, transparency, and robust risk management. It offers advanced backtesting, real-time portfolio monitoring, strategy development tools, and multi-layered risk controls. The platform aims to serve both novice and professional traders with institutional-grade tools and an intuitive interface. Key ambitions include offering the "World's First Retail Quantum Trading Platform" and leveraging a unique performance-based revenue model.
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
 
-## Recent Changes (August 12, 2025)
-
-### Market Data Integration Added
-- Integrated 4 major market data providers: Alpha Vantage, Finnhub, IEX Cloud, Twelve Data
-- Created unified API interface for switching between providers
-- Added real-time quote and historical data endpoints
-- Replaced mock data with authentic market data feeds
-
-### Broker API Integration Added  
-- Integrated Alpaca Markets for live and paper trading
-- Added comprehensive order management system
-- Implemented position tracking and account monitoring
-- Created seamless switching between paper and live trading modes
-
-### Database Migration System
-- Set up proper Drizzle ORM migration scripts
-- Added automated schema management
-- Created migration commands for production deployment
-- Database is fully initialized and ready for production
-
-### Production Readiness
-- All TypeScript errors resolved
-- Real market data integration complete
-- Broker APIs functional with paper trading
-- Authentication and payment systems operational
-- AlphaForge branding and artwork integrated
-- Comprehensive setup documentation created
-
-### Quantum Computing Integration Added (August 14, 2025)
-- Added quantum optimization module with 3 major providers: IBM Quantum, Google Cirq, Amazon Braket
-- Implemented Variational Quantum Eigensolver (VQE) and Quantum Approximate Optimization Algorithm (QAOA)
-- Created quantum portfolio optimization with real algorithms from production systems
-- Added quantum machine learning for market prediction and risk analysis
-- Built comprehensive quantum computing UI with algorithm selection and real-time results
-- Integrated quantum status monitoring and provider switching capabilities
-
-### Performance-Based Revenue Model Added (August 14, 2025)
-- Implemented hybrid pricing model with both subscription and performance-based options
-- Added performance-only plan (30% of profits above 0% return, no monthly fee)
-- Created tiered performance fees: Professional (15% above 10%), Quantum Pro (20% above 8%), Enterprise (25% above 5%)
-- Built comprehensive performance fee calculator and explanation system
-- Integrated industry-standard high watermark accounting methodology
-- Added transparent fee structure with real-world examples and benchmarks
-
-### Comprehensive Fraud Prevention System Added (August 15, 2025)
-- Implemented multi-layered fraud detection with device fingerprinting, IP tracking, and behavioral analysis
-- Added risk scoring system (0-100) with automated blocking for high-risk accounts (70+)
-- Created email pattern detection for disposable addresses and Gmail alias tricks
-- Integrated phone number verification with usage limits (max 3 accounts per number)
-- Built rapid messaging detection to block bot behavior (10+ messages per minute)
-- Added trial eligibility checking to prevent multiple free trials from same device/IP
-- Implemented progressive restrictions: email verification for medium risk, manual review for high risk
-- Created comprehensive database tracking with fraud_prevention and account_verifications tables
-- Built admin fraud reporting system for monitoring suspicious activity patterns
-- Developed automated test suite with 50+ security test cases covering all attack vectors
-
-### Weekly Performance Monitoring System Added (August 15, 2025)
-- Implemented comprehensive performance tracking with user activity, fraud prevention stats, and growth metrics
-- Added automated weekly report generation with HTML email templates sent to emekabron@outlook.com
-- Created performance monitoring system tracking sessions, conversions, troubleshooting opportunities, and recommendations
-- Integrated SendGrid email service for reliable report delivery (with fallback logging if not configured)
-- Built weekly scheduler that automatically sends reports every Monday at 9 AM
-- Added admin dashboard routes for immediate report generation and email testing
-- Implemented growth analytics with week-over-week comparisons and trend analysis
-- Created system health monitoring with response times, error rates, and uptime tracking
-
-### Comprehensive Testing Framework Added (August 19, 2025)
-- Implemented complete test suite using pytest for Python backend testing and Playwright for end-to-end validation
-- Created API core functionality tests validating chat, market data, quantum features, and subscription endpoints
-- Built comprehensive security and fraud prevention test coverage including disposable email detection, rate limiting, and SQL injection protection
-- Added quantum computing feature tests for providers, algorithms, optimization requests, and result validation
-- Integrated performance monitoring tests for weekly reports, scheduler status, and email service functionality
-- Created end-to-end browser tests for user flows, responsive design, and critical interaction paths
-- Validated customer outreach readiness with 93% system reliability across all critical features
-- Confirmed fraud prevention systems actively blocking malicious users and protecting platform integrity
-
-### Customer Outreach Preparation & Domain Deployment (August 20, 2025)
-- Deployed AlphaForge to custom domain alpha-forge.io with DNS verification in progress (2-48 hour timeline)
-- Created comprehensive customer outreach materials including executive pitch, target segments, competitive analysis
-- Developed detailed demo presentation scripts optimized for quantitative traders, retail investors, and financial advisors
-- Built email templates, LinkedIn outreach scripts, and phone call frameworks for customer acquisition
-- Implemented domain monitoring system with automated functionality testing once DNS propagates
-- Prepared press release draft and social media campaign materials for public launch
-- Created customer demo checklist with objection handling and post-demo follow-up sequences
-- Established revenue projections and customer success metrics for launch tracking
-
-### Landing Page Optimization & IP Protection Strategy (August 21, 2025)
-- Optimized landing page for lead capture with 5 strategically placed email signup forms
-- Enhanced quantum trading messaging: "World's First Retail Quantum Trading Platform"
-- Added social proof testimonials and enterprise partnership credibility
-- Emphasized performance-based pricing throughout user journey
-- Updated social media preview image to match AlphaForge branding aesthetic
-- Created comprehensive intellectual property protection strategy including patents, trademarks, and trade secrets
-- Developed competitive moat strategies leveraging quantum computing expertise and exclusive partnerships
-- Established monitoring systems for brand protection and competitive intelligence
-
-### Advanced Security Canary System & Arize Integration (August 22, 2025)
-- Implemented professional security canary system with 6 hidden API endpoints for intrusion detection
-- Added comprehensive copyright protection with "PROPRIETARY AND CONFIDENTIAL" markings on all core files
-- Integrated security event monitoring with Arize Phoenix for real-time threat detection and analysis
-- Created automated response protocols for different threat levels (low to critical)
-- Enhanced observability system with dedicated security event tracing and anomaly detection
-- Deployed honeypot endpoints that confuse attackers while gathering intelligence on probe attempts
-- Established free competitive monitoring framework with Google Alerts and social media tracking
-- Documented patent filing priorities for quantum trading methods and performance-based pricing systems
-
-### Executive Email Notification System (August 22, 2025)
-- Successfully configured SMTP email delivery for executive alerts and compliance reporting
-- Implemented automated daily reports (6 AM) with security summaries and business intelligence
-- Created weekly board reports (Monday 8 AM) with strategic analysis and revenue pipeline updates
-- Added real-time critical alert notifications for high-value prospects and security incidents
-- Integrated HTML-formatted professional reports with executive dashboard links and action items
-- Established complete email notification system using Gmail/Outlook SMTP for reliable delivery
-
-### Arize AI Observability Integration Added (August 20, 2025)
-- Implemented comprehensive OpenTelemetry-based observability system compatible with Arize AI and Phoenix platforms
-- Added enterprise-grade telemetry tracking for all critical operations: trading, quantum computing, fraud detection, user actions
-- Created modular tracing functions for different operation types with rich contextual metadata
-- Built comprehensive demo system showcasing all observability features and trace data
-- Integrated authentication headers and configuration for Arize AI cloud platform connection
-- Added performance monitoring with minimal overhead for high-frequency trading operations
-- Created detailed integration guide and setup documentation for enterprise deployment
-- Positioned platform for institutional observability requirements and advanced analytics capabilities
-
 ## System Architecture
 
 ### Frontend Architecture
-- **Framework**: React 18 with TypeScript using Vite for build tooling and development server
-- **UI Library**: Shadcn/UI components built on Radix UI primitives with Tailwind CSS for styling
-- **State Management**: TanStack React Query for server state management and caching
-- **Routing**: Wouter for client-side routing with role-based access control
-- **Theme System**: Built-in dark/light mode support with CSS custom properties
+- **Framework**: React 18 with TypeScript, Vite for build tooling.
+- **UI Library**: Shadcn/UI (on Radix UI primitives) with Tailwind CSS.
+- **State Management**: TanStack React Query for server state and caching.
+- **Routing**: Wouter for client-side routing with role-based access control.
+- **Theme System**: Dark/light mode support with CSS custom properties.
+- **UI/UX Decisions**: Mobile-first responsive design, progressive disclosure for setup wizards, real-time data updates, ARIA-compliant components.
 
 ### Backend Architecture
-- **Runtime**: Node.js with Express.js REST API server
-- **Authentication**: Replit Auth integration with OpenID Connect (OIDC) for secure user authentication
-- **Session Management**: Express sessions with PostgreSQL storage using connect-pg-simple
-- **API Design**: RESTful endpoints with comprehensive error handling and request logging
+- **Runtime**: Node.js with Express.js REST API server.
+- **Authentication**: Replit Auth (OpenID Connect) for secure user authentication.
+- **Session Management**: Express sessions with PostgreSQL storage using `connect-pg-simple`.
+- **API Design**: RESTful endpoints with error handling and request logging.
 
 ### Database Architecture
-- **Primary Database**: PostgreSQL with Neon serverless connection pooling
-- **ORM**: Drizzle ORM with type-safe schema definitions and migrations
-- **Schema Design**: Normalized tables for users, strategies, positions, transactions, backtest results, and risk metrics
-- **Session Storage**: Dedicated sessions table for authentication state persistence
+- **Primary Database**: PostgreSQL with Neon serverless connection pooling.
+- **ORM**: Drizzle ORM with type-safe schema definitions and migrations.
+- **Schema Design**: Normalized tables for users, strategies, positions, transactions, backtest results, and risk metrics.
+- **Session Storage**: Dedicated sessions table for authentication state persistence.
 
 ### Core Application Features
-- **Portfolio Management**: Real-time position tracking, P&L calculation, and performance monitoring
-- **Strategy Development**: Visual strategy builder with technical analysis and statistical arbitrage support
-- **Backtesting Engine**: Historical simulation with realistic transaction costs, slippage modeling, and survivorship bias correction
-- **Risk Management**: Value-at-Risk calculations, drawdown monitoring, position limits, and configurable kill-switches
-- **Paper Trading**: Risk-free strategy testing with shadow portfolio functionality
-- **Analytics Dashboard**: Chart.js integration for performance visualization and compliance reporting
+- **Portfolio Management**: Real-time position tracking, P&L, and performance monitoring.
+- **Strategy Development**: Visual builder with technical analysis and statistical arbitrage support.
+- **Backtesting Engine**: Historical simulation with realistic costs, slippage, and survivorship bias correction.
+- **Risk Management**: Value-at-Risk, drawdown monitoring, position limits, and kill-switches.
+- **Paper Trading**: Risk-free strategy testing with shadow portfolio functionality.
+- **Analytics Dashboard**: Chart.js for performance visualization and compliance reporting.
+- **Quantum Optimization**: Module with IBM Quantum, Google Cirq, Amazon Braket integrations for VQE, QAOA, portfolio optimization, and quantum ML.
+- **Fraud Prevention**: Multi-layered detection (device fingerprinting, IP tracking, behavioral analysis), risk scoring, email/phone verification, bot behavior detection, trial eligibility.
+- **Performance Monitoring**: Automated weekly reports for user activity, fraud stats, growth metrics.
+- **Broker Onboarding**: Comprehensive 4-step setup flow for Alpaca Markets, smart alerts, dedicated setup page, AI chatbot integration.
+- **Security Canary System**: 6 hidden API endpoints for intrusion detection, honeypots, and integration with Arize Phoenix for real-time threat detection.
+- **Observability**: OpenTelemetry-based system compatible with Arize AI for tracing critical operations (trading, quantum, fraud, user actions).
 
-### User Experience Design
-- **Responsive Layout**: Mobile-first design with adaptive sidebar navigation
-- **Progressive Disclosure**: Step-by-step wizards for strategy setup and configuration
-- **Real-time Updates**: Live data streaming for portfolio values and risk metrics
-- **Accessibility**: ARIA-compliant components with keyboard navigation support
+### Technical Implementations
+- **Payment Processing**: Stripe integration for subscriptions and performance-based pricing (15-30% on profits above benchmark).
+- **Testing Framework**: Pytest for backend, Playwright for E2E validation, covering API functionality, security, quantum features, and user flows.
+- **Email Notifications**: SMTP for executive alerts, daily security summaries, weekly board reports, and critical alerts.
 
 ## External Dependencies
 
 ### Payment Processing
-- **Stripe Integration**: Full payment processing with subscription management for tiered pricing plans
-- **Billing Models**: Trial-based onboarding with automated subscription conversion
-- **Performance-Based Pricing**: Revenue sharing model with 15-30% performance fees on profits above benchmark
-- **Hybrid Model**: Both fixed subscription and performance-only pricing options available
+- **Stripe**: For subscription management and performance-based billing.
 
 ### Development Tools
-- **Build System**: Vite with React plugin and TypeScript support
-- **Code Quality**: ESLint and TypeScript compiler for static analysis
-- **Development Environment**: Replit-specific tooling with hot module replacement
+- **Vite**: Build system for frontend.
+- **ESLint**: Code quality.
+- **TypeScript**: Static analysis.
+- **Replit-specific tooling**: For development environment.
 
 ### Third-Party Services
-- **Database Provider**: Neon Database for PostgreSQL hosting with connection pooling
-- **Authentication Provider**: Replit Auth for OAuth-based user authentication
-- **UI Components**: Radix UI for accessible component primitives
-- **Styling**: Tailwind CSS for utility-first styling approach
-- **Charts**: Chart.js for financial data visualization
-- **State Management**: TanStack React Query for server state synchronization
+- **Neon Database**: PostgreSQL hosting.
+- **Replit Auth**: OAuth-based user authentication.
+- **Radix UI**: Accessible UI component primitives.
+- **Tailwind CSS**: Utility-first styling.
+- **Chart.js**: Financial data visualization.
+- **TanStack React Query**: Server state synchronization.
+- **SendGrid**: Email service for report delivery.
+- **Arize AI / Arize Phoenix**: AI observability and security event monitoring.
 
 ### API Integrations
-- **Market Data**: Designed for integration with financial data providers (implementation pending)
-- **Broker APIs**: Architecture prepared for live trading integration
-- **Notification Services**: Email and webhook support for alerts and reporting
+- **Market Data Providers**: Alpha Vantage, Finnhub, IEX Cloud, Twelve Data (for real-time and historical data).
+- **Broker APIs**: Alpaca Markets (for live and paper trading).
+- **Quantum Computing Providers**: IBM Quantum, Google Cirq, Amazon Braket.
