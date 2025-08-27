@@ -6,6 +6,8 @@
 import { Navbar } from "@/components/layout/navbar";
 import { Sidebar } from "@/components/layout/sidebar";
 import BrokerOnboardingFlow from "@/components/BrokerOnboardingFlow";
+import BrokerFlexibilityInfo from "@/components/BrokerFlexibilityInfo";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function BrokerSetup() {
   return (
@@ -20,11 +22,24 @@ export default function BrokerSetup() {
                 Broker Account Setup
               </h1>
               <p className="text-gray-600 dark:text-gray-400">
-                Connect your Alpaca trading account to enable live quantum trading with real money
+                Connect your preferred broker to enable live quantum trading with real money
               </p>
             </div>
 
-            <BrokerOnboardingFlow />
+            <Tabs defaultValue="setup" className="space-y-6">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="setup">Quick Setup (Alpaca)</TabsTrigger>
+                <TabsTrigger value="brokers">All Supported Brokers</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="setup">
+                <BrokerOnboardingFlow />
+              </TabsContent>
+
+              <TabsContent value="brokers">
+                <BrokerFlexibilityInfo />
+              </TabsContent>
+            </Tabs>
           </div>
         </main>
       </div>

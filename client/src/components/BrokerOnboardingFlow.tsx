@@ -306,9 +306,19 @@ export default function BrokerOnboardingFlow() {
         <Info className="h-4 w-4 text-blue-600" />
         <AlertDescription className="text-blue-800 dark:text-blue-200">
           <strong>Why connect a broker?</strong> AlphaForge's quantum algorithms need a licensed broker 
-          to execute real trades. Alpaca provides commission-free trading with excellent API integration, 
-          making it perfect for algorithmic trading. You can start with paper trading (virtual money) 
+          to execute real trades. We recommend Alpaca for commission-free trading and excellent API integration, 
+          but you can use your preferred broker. You can start with paper trading (virtual money) 
           and switch to live trading when ready.
+        </AlertDescription>
+      </Alert>
+
+      {/* Broker Flexibility Notice */}
+      <Alert className="border-green-200 bg-green-50 dark:bg-green-950">
+        <CheckCircle className="h-4 w-4 text-green-600" />
+        <AlertDescription className="text-green-800 dark:text-green-200">
+          <strong>Use Your Preferred Broker:</strong> While we feature Alpaca for its excellent API and 
+          commission-free trading, AlphaForge works with multiple brokers. Contact support if you prefer 
+          Interactive Brokers, TD Ameritrade, E*TRADE, or another licensed broker.
         </AlertDescription>
       </Alert>
     </div>

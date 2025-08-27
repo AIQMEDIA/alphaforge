@@ -22,12 +22,12 @@ I'm your personal guide for connecting your Alpaca trading account to AlphaForge
 - Use quantum algorithms with real money
 - Full risk management and stop-losses
 
-### 📋 Broker Setup Steps:
+### 📋 Broker Setup Steps (Alpaca Recommended):
 
-1. **Create Alpaca Account** (5 minutes)
-   - Go to alpaca.markets
-   - Choose "Individual Account"
-   - Complete application with your information
+1. **Create Broker Account** (5 minutes)
+   - Alpaca: Go to alpaca.markets (recommended for commission-free trading)
+   - Alternative: Use your preferred licensed broker (Interactive Brokers, TD Ameritrade, etc.)
+   - Choose "Individual Account" and complete application
 
 2. **Account Verification** (1-3 business days)
    - Upload ID and address proof
@@ -35,12 +35,12 @@ I'm your personal guide for connecting your Alpaca trading account to AlphaForge
    - Fund with minimum $100
 
 3. **Generate API Keys** (3 minutes)
-   - Login to Alpaca dashboard
+   - Login to your broker dashboard
    - Create paper trading keys first
    - Generate live trading keys when ready
 
 4. **Connect to AlphaForge** (2 minutes)
-   - Contact our support team
+   - Contact our support team with your broker preference
    - We'll securely configure your keys
    - Start with paper trading, upgrade to live
 
@@ -53,8 +53,8 @@ I'm your personal guide for connecting your Alpaca trading account to AlphaForge
 
 ### ❓ Common Questions:
 
-**Q: Is Alpaca safe?**
-A: Yes, Alpaca is SIPC-insured and regulated by FINRA. Your funds are protected up to $500,000.
+**Q: Is Alpaca safe? Can I use other brokers?**
+A: Yes, Alpaca is SIPC-insured and regulated by FINRA. You can also use Interactive Brokers, TD Ameritrade, E*TRADE, or other licensed brokers. All are regulated and insured.
 
 **Q: What's the minimum to start?**
 A: $100 for live trading, $0 for paper trading. We recommend starting with paper trading.
@@ -94,9 +94,10 @@ ${BROKER_SETUP_GUIDANCE}
 
 What specific part of the broker setup can I help you with? Are you looking to:
 1. Start paper trading immediately (no broker needed)
-2. Create an Alpaca account for real money trading
-3. Configure API keys
-4. Understand the differences between paper and live trading
+2. Set up with Alpaca (recommended for commission-free trading)
+3. Use a different broker (Interactive Brokers, TD Ameritrade, etc.)
+4. Configure API keys for your preferred broker
+5. Understand the differences between paper and live trading
 
 Just let me know what you'd like to focus on first!`;
   }

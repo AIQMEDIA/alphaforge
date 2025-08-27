@@ -59,7 +59,7 @@ export default function SmartBrokerAlert({ className = "" }: SmartBrokerAlertPro
               </div>
               <p className="mb-3">
                 To use quantum algorithms with real money, connect a broker account. 
-                This takes 5 minutes to set up.
+                We recommend Alpaca, but you can use your preferred broker.
               </p>
               <div className="flex gap-2 flex-wrap">
                 <Button 
