@@ -227,7 +227,7 @@ export default function QuantumOptimization() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {quantumStatus?.providers?.map((provider: any) => (
+                    {(quantumStatus as any)?.providers?.map((provider: any) => (
                       <div key={provider.name} className="flex items-center justify-between p-3 border rounded-lg">
                         <div>
                           <p className="font-medium">{provider.name}</p>
@@ -241,13 +241,17 @@ export default function QuantumOptimization() {
                           <AlertTriangle className="h-5 w-5 text-yellow-500" />
                         )}
                       </div>
-                    ))}
+                    )) || (
+                      <div className="col-span-3 text-center py-4 text-gray-500">
+                        Loading quantum providers...
+                      </div>
+                    )}
                   </div>
                   
-                  {quantumStatus?.recommendedSetup && (
+                  {(quantumStatus as any)?.recommendedSetup && (
                     <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
                       <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                        <strong>Setup Required:</strong> {quantumStatus.recommendedSetup}
+                        <strong>Setup Required:</strong> {(quantumStatus as any).recommendedSetup}
                       </p>
                     </div>
                   )}
